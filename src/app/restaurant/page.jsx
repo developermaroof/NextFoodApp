@@ -1,13 +1,17 @@
 "use client";
 import React, { useState } from "react";
-import RestaurantLogin from "../_components/restaurantLogin";
-import RestaurantSignup from "../_components/restaurantSignup";
+import RestaurantLogin from "../_components/RestaurantLogin";
+import RestaurantSignup from "../_components/RestaurantSignup";
+import RestaurantHeader from "../_components/RestaurantHeader";
+import "./restaurant.css";
+import Footer from "../_components/Footer";
 
 const Restaurant = () => {
   const [login, setLogin] = useState(true);
   return (
     <>
       <div className="container">
+        <RestaurantHeader />
         <h1>Restaurant Login/Signup Page</h1>
         {login ? <RestaurantLogin /> : <RestaurantSignup />}
 
@@ -18,6 +22,7 @@ const Restaurant = () => {
               : "Already have an account? Login"}
           </button>
         </div>
+        <Footer />
       </div>
     </>
   );
