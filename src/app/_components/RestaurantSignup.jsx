@@ -9,7 +9,7 @@ const RestaurantSignup = () => {
   const [address, setAddress] = useState("");
   const [contact, setContact] = useState("");
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     console.log(
       "SignUp Clicked",
       email,
@@ -20,6 +20,22 @@ const RestaurantSignup = () => {
       address,
       contact
     );
+    let result = await fetch("http://localhost:3000/api/restaurant", {
+      method: "POST",
+      body: JSON.stringify({
+        email,
+        password,
+        restaurantName,
+        city,
+        address,
+        contact,
+      }),
+    });
+    result = await result.json();
+    console.log(result);
+    if (result.success) {
+      alert("Successfully Signed Up");
+    }
   };
 
   return (

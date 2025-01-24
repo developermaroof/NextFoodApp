@@ -10,3 +10,11 @@ export async function GET() {
 
   return NextResponse.json({ result: data });
 }
+
+export async function POST(req) {
+  let payload = await req.json();
+  await mongoose.connect(connectionStr, { useNewUrlParser: true });
+  let restaurant = new restaurantSchema(payload);
+  const data = await restaurant.save();
+  return NextResponse.json({ result: data, success: true });
+}
