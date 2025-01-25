@@ -10,8 +10,31 @@ const RestaurantSignup = () => {
   const [address, setAddress] = useState("");
   const [contact, setContact] = useState("");
   const router = useRouter();
+  const [error, setError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
 
   const handleSignUp = async () => {
+    if (password !== confPassword) {
+      setPasswordError(true);
+      return false;
+    } else {
+      setPasswordError(false);
+    }
+    if (
+      (!email,
+      !password,
+      !confPassword,
+      !restaurantName,
+      !city,
+      !address,
+      !contact)
+    ) {
+      setError(true);
+      return false;
+    } else {
+      setError(false);
+    }
+
     console.log(
       "SignUp Clicked",
       email,
@@ -56,6 +79,9 @@ const RestaurantSignup = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
+          {error && !email && (
+            <span className="input-error">Email is Required</span>
+          )}
         </div>
         <div className="input-wrapper">
           <input
@@ -65,6 +91,12 @@ const RestaurantSignup = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          {error && !password && (
+            <span className="input-error">Password is Required</span>
+          )}
+          {passwordError && (
+            <span className="input-error">Passwords do not match</span>
+          )}
         </div>
         <div className="input-wrapper">
           <input
@@ -74,6 +106,12 @@ const RestaurantSignup = () => {
             value={confPassword}
             onChange={(e) => setConfPassword(e.target.value)}
           />
+          {error && !confPassword && (
+            <span className="input-error">Password is Required</span>
+          )}
+          {passwordError && (
+            <span className="input-error">Passwords do not match</span>
+          )}
         </div>
         <div className="input-wrapper">
           <input
@@ -83,6 +121,9 @@ const RestaurantSignup = () => {
             value={restaurantName}
             onChange={(e) => setRestaurantName(e.target.value)}
           />
+          {error && !restaurantName && (
+            <span className="input-error">Restaurant Name is Required</span>
+          )}
         </div>
         <div className="input-wrapper">
           <input
@@ -92,6 +133,9 @@ const RestaurantSignup = () => {
             value={city}
             onChange={(e) => setCity(e.target.value)}
           />
+          {error && !city && (
+            <span className="input-error">City is Required</span>
+          )}
         </div>
         <div className="input-wrapper">
           <input
@@ -101,6 +145,9 @@ const RestaurantSignup = () => {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
           />
+          {error && !address && (
+            <span className="input-error">Address is Required</span>
+          )}
         </div>
         <div className="input-wrapper">
           <input
@@ -110,6 +157,9 @@ const RestaurantSignup = () => {
             value={contact}
             onChange={(e) => setContact(e.target.value)}
           />
+          {error && !contact && (
+            <span className="input-error">Contact No is Required</span>
+          )}
         </div>
         <div className="input-wrapper">
           <button className="button" onClick={handleSignUp}>

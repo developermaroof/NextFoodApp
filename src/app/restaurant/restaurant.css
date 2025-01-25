@@ -33,3 +33,10 @@
     font-size: 10px;
     background-color: white;
 }
+
+.input-error{
+    position: absolute;
+    padding: 8px;
+    color: red;
+    font-size: 12px;
+}
