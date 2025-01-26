@@ -12,7 +12,7 @@ const Dashboard = () => {
       <RestaurantHeader />
       <button onClick={() => setAddItem(true)}>Add Food</button>
       <button onClick={() => setAddItem(false)}>Dashboard</button>
-      {addItem ? <AddFoodItem /> : <FoodItemList />}
+      {addItem ? <AddFoodItem setAddItem={setAddItem} /> : <FoodItemList />}
     </div>
   );
 };

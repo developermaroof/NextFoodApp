@@ -13,3 +13,14 @@ export async function GET(req, content) {
   }
   return NextResponse.json({ result, success });
 }
+
+export async function DELETE(req, content) {
+  const id = content.params.id;
+  let success = false;
+  await mongoose.connect(connectionStr, { useNewUrlParser: true });
+  const result = await foodSchema.deleteOne({ _id: id });
+  if (result.deletedCount > 0) {
+    success = true;
+  }
+  return NextResponse.json({ result, success });
+}
