@@ -30,3 +30,14 @@
     color: red;
     font-size: 12px;
 }
+
+table, th, td{
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 10px;
+}
+
+table td button{
+    cursor: pointer;
+    margin: 5px;
+}
