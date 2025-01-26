@@ -2,7 +2,7 @@ const { default: mongoose } = require("mongoose");
 
 const foodModel = new mongoose.Schema({
   name: String,
-  price: Number,
+  price: String,
   path: String,
   description: String,
   food_id: mongoose.Schema.Types.ObjectId,
