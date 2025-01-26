@@ -41,3 +41,7 @@ table td button{
     cursor: pointer;
     margin: 5px;
 }
+
+table img{
+    width: 100px;
+}
