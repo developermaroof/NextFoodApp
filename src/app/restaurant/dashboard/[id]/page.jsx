@@ -39,6 +39,26 @@ const EditFoodItem = ({ params }) => {
     } else {
       setError(false);
     }
+
+    let response = await fetch(
+      `http://localhost:3000/api/restaurant/foods/edit/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify({
+          name,
+          price,
+          path,
+          description,
+        }),
+      }
+    );
+    response = await response.json();
+    if (response.success) {
+      alert("Food item has been Updated Successfully!");
+      router.push("../dashboard");
+    } else {
+      alert("Failed to Update Food Item!");
+    }
   };
 
   return (
