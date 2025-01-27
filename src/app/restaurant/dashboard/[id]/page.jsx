@@ -1,9 +1,10 @@
 "use client";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const EditFoodItem = ({ params }) => {
-  console.log(params.id);
+  const id = params.id;
+  console.log("ID:", id);
 
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
@@ -11,6 +12,24 @@ const EditFoodItem = ({ params }) => {
   const [description, setDescription] = useState("");
   const [error, setError] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    handleLoadFoodItem();
+  }, []);
+
+  const handleLoadFoodItem = async () => {
+    let response = await fetch(
+      `http://localhost:3000/api/restaurant/foods/edit/${id}`
+    );
+    response = await response.json();
+    if (response.success) {
+      console.log(response.result);
+      setName(response.result.name);
+      setPrice(response.result.price);
+      setPath(response.result.path);
+      setDescription(response.result.description);
+    }
+  };
 
   const handleEditFood = async () => {
     console.log(name, price, path, description);
