@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import RestaurantLogin from "../_components/RestaurantLogin";
 import RestaurantSignup from "../_components/RestaurantSignup";
 import RestaurantHeader from "../_components/RestaurantHeader";
-import "./restaurant.css";
 import Footer from "../_components/Footer";
 
 const Restaurant = () => {
