@@ -86,7 +86,7 @@ table img{
     width: 100px;
 }
 
-.main-page-banner{
+.main-page-banner, .restaurant-page-banner{
     background-image: url("https://media.istockphoto.com/id/1316145932/photo/table-top-view-of-spicy-food.jpg?s=612x612&w=0&k=20&c=eaKRSIAoRGHMibSfahMyQS6iFADyVy1pnPdy1O5rZ98=");
     background-color: rgb(0, 0, 0,0.5);
     background-blend-mode: multiply;
@@ -169,4 +169,8 @@ table img{
 
 .restaurant-wrapper .address{
     margin-left: 5px;
+}
+
+.restaurant-page-banner h1{
+    font-size: 65px;
 }
