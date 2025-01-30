@@ -22,8 +22,14 @@ export default function Home() {
     }
   };
 
-  const loadRestaurants = async () => {
-    let response = await fetch("http://localhost:3000/api/customer");
+  const loadRestaurants = async (params) => {
+    let url = "http://localhost:3000/api/customer";
+    if (params?.location) {
+      url = url + "?location=" + encodeURIComponent(params.location);
+    } else if (params?.restaurant) {
+      url = url + "?restaurant=" + encodeURIComponent(params.restaurant);
+    }
+    let response = await fetch(url);
     response = await response.json();
     if (response.success) {
       setRestaurants(response.result);
@@ -33,6 +39,7 @@ export default function Home() {
   const handleListItem = (item) => {
     setSelectedLocation(item);
     setShowLocations(false);
+    loadRestaurants({ location: item });
   };
 
   return (
@@ -48,17 +55,21 @@ export default function Home() {
             placeholder="Select Place"
             value={selectedLocation}
             onClick={() => setShowLocations(true)}
+            readOnly
           />
           <ul className="location-list">
             {showLocations &&
-              locations.map((item) => {
-                return <li onClick={() => handleListItem(item)}>{item}</li>;
-              })}
+              locations.map((item) => (
+                <li key={item} onClick={() => handleListItem(item)}>
+                  {item}
+                </li>
+              ))}
           </ul>
           <input
             className="search-input"
             type="text"
             placeholder="Enter Food or Restaurant"
+            onChange={(e) => loadRestaurants({ restaurant: e.target.value })}
           />
         </div>
       </div>
@@ -66,7 +77,7 @@ export default function Home() {
       {/* Restaurants */}
       <div className="restaurant-list-container">
         {restaurants.map((item) => (
-          <div className="restaurant-wrapper">
+          <div className="restaurant-wrapper" key={item._id}>
             <div className="heading-wrapper">
               <h3>{item.restaurantName}</h3>
               <h5>Contact: {item.contact}</h5>
@@ -74,7 +85,7 @@ export default function Home() {
             <div className="address-wrapper">
               <div>{item.city},</div>
               <div className="address">
-                {item.address}, Email: {item.email}{" "}
+                {item.address}, Email: {item.email}
               </div>
             </div>
           </div>
