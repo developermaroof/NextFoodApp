@@ -119,3 +119,22 @@ table img{
     border-left: 1px solid #ccc;
     padding-left: 15px;
 }
+
+.location-list{
+    color: black;
+    list-style-type: none;
+    text-align: left;
+    position: absolute;
+    background-color: white;
+    padding: 0;
+    margin: 0;
+    margin-left: -5px;
+    border: 1px solid #ccc;
+}
+
+.location-list li{
+    width: 180px;
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
