@@ -8,6 +8,17 @@ const Details = (props) => {
   const [restaurantDetails, setRestaurantDetails] = useState();
   const [foodItems, setFoodItems] = useState([]);
   const [cartData, setCartData] = useState();
+  const [cartStorage, setCartStorage] = useState(
+    JSON.parse(localStorage.getItem("cartData"))
+  );
+  const [cartId, setCartId] = useState(
+    cartStorage
+      ? () =>
+          cartStorage.map((item) => {
+            return item._id;
+          })
+      : []
+  );
 
   useEffect(() => {
     loadRestaurantDetails();
@@ -26,6 +37,9 @@ const Details = (props) => {
 
   const handleAddToCart = (item) => {
     setCartData(item);
+    let localCartIds = cartId;
+    localCartIds.push(item._id);
+    setCartId(localCartIds);
   };
 
   return (
@@ -51,9 +65,13 @@ const Details = (props) => {
                 <div>{item.name}</div>
                 <div>{item.price}</div>
                 <div className="description">{item.description}</div>
-                <button onClick={() => handleAddToCart(item)}>
-                  Add to Cart
-                </button>
+                {cartId.includes(item._id) ? (
+                  <button>Remove from cart</button>
+                ) : (
+                  <button onClick={() => handleAddToCart(item)}>
+                    Add to Cart
+                  </button>
+                )}
               </div>
             </div>
           ))
