@@ -10,6 +10,7 @@
 .header-wrapper{
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .header-wrapper ul{
@@ -182,11 +183,9 @@ table img{
 
 .detail-wrapper{
     display: flex;
+    justify-content: space-between;
+    padding: 0px 10px;
     background-color: orange;
-}
-
-.detail-wrapper h4{
-    width: 50%;
 }
 
 .food-item-wrapper{
