@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 
 const CustomerHeader = (props) => {
   const cartStorage = JSON.parse(localStorage.getItem("cartData"));
-  const [cartNumber, setCartNumber] = useState(cartStorage?.length || 0);
+  const [cartNumber, setCartNumber] = useState(cartStorage?.length);
   const [cartItems, setCartItems] = useState(cartStorage);
 
   useEffect(() => {
@@ -60,7 +60,9 @@ const CustomerHeader = (props) => {
           <Link href="/">SignUp</Link>
         </li>
         <li>
-          <Link href="/">Cart({cartNumber})</Link>
+          <Link href={cartNumber ? "/cart" : "#"}>
+            Cart({cartNumber ? cartNumber : 0})
+          </Link>
         </li>
         <li>
           <Link href="/restaurant">Add Restaurant</Link>
