@@ -19,6 +19,7 @@ const Details = (props) => {
           })
       : []
   );
+  const [removeCartData, setRemoveCartData] = useState();
 
   useEffect(() => {
     loadRestaurantDetails();
@@ -40,11 +41,19 @@ const Details = (props) => {
     let localCartIds = cartId;
     localCartIds.push(item._id);
     setCartId(localCartIds);
+    setRemoveCartData();
+  };
+
+  const handleRemoveFromCart = (id) => {
+    setRemoveCartData(id);
+    var localIds = cartId.filter((item) => item != id);
+    setCartData();
+    setCartId(localIds);
   };
 
   return (
     <div>
-      <CustomerHeader cartData={cartData} />
+      <CustomerHeader cartData={cartData} removeCartData={removeCartData} />
       <div className="restaurant-page-banner">
         <h1>{decodeURI(restaurantName)}</h1>
       </div>
@@ -66,7 +75,9 @@ const Details = (props) => {
                 <div>{item.price}</div>
                 <div className="description">{item.description}</div>
                 {cartId.includes(item._id) ? (
-                  <button>Remove from cart</button>
+                  <button onClick={() => handleRemoveFromCart(item._id)}>
+                    Remove from cart
+                  </button>
                 ) : (
                   <button onClick={() => handleAddToCart(item)}>
                     Add to Cart

@@ -30,6 +30,20 @@ const CustomerHeader = (props) => {
     }
   }, [props.cartData]);
 
+  useEffect(() => {
+    if (props.removeCartData) {
+      let localCartItem = cartItems.filter((item) => {
+        return item._id != props.removeCartData;
+      });
+      setCartItems(localCartItem);
+      setCartNumber(cartNumber - 1);
+      localStorage.setItem("cartData", JSON.stringify(localCartItem));
+      if (localCartItem.length == 0) {
+        localStorage.removeItem("cartData");
+      }
+    }
+  }, [props.removeCartData]);
+
   return (
     <div className="header-wrapper">
       <div className="logo">
