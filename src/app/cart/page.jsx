@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import CustomerHeader from "../_components/CustomerHeader";
 import Footer from "../_components/Footer";
+import { useRouter } from "next/navigation";
 
 const Cart = () => {
   const [cartStorage, setCartStorage] = useState(() => {
@@ -16,11 +17,17 @@ const Cart = () => {
     }, 0)
   );
 
+  const router = useRouter();
+
   // Tax calculation (5% example)
   const taxRate = 5; // 5% tax rate
   const tax = (total * taxRate) / 100;
   const delivery = 200;
   const totalAmount = total + tax + delivery;
+
+  const handleOrderNow = () => {
+    router.push("/order");
+  };
 
   return (
     <div>
@@ -70,7 +77,7 @@ const Cart = () => {
           </div>
         </div>
         <div className="block-2">
-          <button>Order Now</button>
+          <button onClick={handleOrderNow}>Order Now</button>
         </div>
       </div>
       <Footer />
