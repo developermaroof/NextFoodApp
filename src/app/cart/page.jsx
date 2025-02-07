@@ -26,7 +26,11 @@ const Cart = () => {
   const totalAmount = total + tax + delivery;
 
   const handleOrderNow = () => {
-    router.push("/order");
+    if (JSON.parse(localStorage.getItem("user"))) {
+      router.push("/order");
+    } else {
+      router.push("/user-auth?order=true");
+    }
   };
 
   return (
