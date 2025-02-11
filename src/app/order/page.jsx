@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CustomerHeader from "../_components/CustomerHeader";
 import Footer from "../_components/Footer";
+import { useRouter } from "next/navigation";
 
 const Order = () => {
   const [userStorage, setUserStorage] = useState(
@@ -20,11 +21,20 @@ const Order = () => {
     }, 0)
   );
 
+  const [removeCartData, setRemoveCartData] = useState(false);
+  const router = useRouter();
+
   // Tax calculation (5% example)
   const taxRate = 5; // 5% tax rate
   const tax = (total * taxRate) / 100;
   const delivery = 200;
   const totalAmount = total + tax + delivery;
+
+  useEffect(() => {
+    if (!total) {
+      router.push("/");
+    }
+  }, [total]);
 
   const handleOrderNow = async () => {
     let user_id = JSON.parse(localStorage.getItem("user"))._id;
@@ -47,6 +57,8 @@ const Order = () => {
     response = await response.json();
     if (response.success) {
       alert("Order Placed Successfully");
+      setRemoveCartData(true);
+      router.push("/myprofile");
     } else {
       alert("Failed to Place Order");
     }
@@ -54,7 +66,7 @@ const Order = () => {
 
   return (
     <div>
-      <CustomerHeader />
+      <CustomerHeader removeCartData={removeCartData} />
 
       <div className="total-wrapper">
         <div className="block-1">

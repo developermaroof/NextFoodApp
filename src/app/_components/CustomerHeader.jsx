@@ -52,6 +52,14 @@ const CustomerHeader = (props) => {
     }
   }, [props.removeCartData]);
 
+  useEffect(() => {
+    if (props.removeCartData) {
+      setCartItems([]);
+      setCartNumber(0);
+      localStorage.removeItem("cartData");
+    }
+  }, [props.removeCartData]);
+
   const handleLogOut = () => {
     localStorage.removeItem("user");
     setUser(undefined);
