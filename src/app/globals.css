@@ -267,3 +267,17 @@ table img{
     border-radius: 4px;
     cursor: pointer;
 }
+
+.auth-container{
+    display: flex;
+    justify-content: center;
+}
+
+.login-wrapper,.signup-wrapper{
+    height: 400px;
+    margin: 50px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    width: 50%;
+    text-align: center;
+}

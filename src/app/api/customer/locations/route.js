@@ -7,7 +7,7 @@ export async function GET() {
   await mongoose.connect(connectionStr, { useNewUrlParser: true });
   let result = await restaurantSchema.find();
   result = result.map(
-    (item) => item.city.charAt(0).toUpperCase() + item.city.slice(1)
+    (item) => item?.city?.charAt(0).toUpperCase() + item?.city?.slice(1)
   );
   result = [...new Set(result.map((item) => item))];
 

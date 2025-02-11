@@ -4,11 +4,15 @@ import React, { useEffect, useState } from "react";
 
 const CustomerHeader = (props) => {
   // for cart
-  const cartStorage = JSON.parse(localStorage.getItem("cartData"));
+  const cartStorage =
+    localStorage.getItem("cartData") &&
+    JSON.parse(localStorage.getItem("cartData"));
   const [cartNumber, setCartNumber] = useState(cartStorage?.length);
   const [cartItems, setCartItems] = useState(cartStorage);
   // for user
-  const userStorage = JSON.parse(localStorage.getItem("user"));
+  const userStorage =
+    JSON.parse(localStorage.getItem("user")) &&
+    JSON.parse(localStorage.getItem("user"));
   const [user, setUser] = useState(userStorage ? userStorage : undefined);
   console.log(userStorage);
 
