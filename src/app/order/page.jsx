@@ -38,6 +38,7 @@ const Order = () => {
 
   const handleOrderNow = async () => {
     let user_id = JSON.parse(localStorage.getItem("user"))._id;
+
     let cart = JSON.parse(localStorage.getItem("cartData"));
     let foodItemIds = cart.map((item) => item._id).toString();
     let resto_id = cart[0].food_id;
