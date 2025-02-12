@@ -104,6 +104,9 @@ const CustomerHeader = (props) => {
           </Link>
         </li>
         <li>
+          <Link href="/deliverypartner">Delivery Partner</Link>
+        </li>
+        <li>
           <Link href="/restaurant">Add Restaurant</Link>
         </li>
       </ul>
