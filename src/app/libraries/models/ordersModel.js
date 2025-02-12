@@ -4,7 +4,7 @@ const orderModel = new mongoose.Schema({
   user_id: mongoose.Schema.Types.ObjectId,
   resto_id: mongoose.Schema.Types.ObjectId,
   foodItemIds: String,
-  deliveryBoy: String,
+  deliveryBoy_id: mongoose.Schema.Types.ObjectId,
   status: String,
   amount: String,
 });

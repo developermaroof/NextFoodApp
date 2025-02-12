@@ -38,16 +38,31 @@ const Order = () => {
 
   const handleOrderNow = async () => {
     let user_id = JSON.parse(localStorage.getItem("user"))._id;
+    let user_city = JSON.parse(localStorage.getItem("user")).city;
 
     let cart = JSON.parse(localStorage.getItem("cartData"));
+
     let foodItemIds = cart.map((item) => item._id).toString();
+
     let resto_id = cart[0].food_id;
-    let deliveryBoy = "67966d234f263498a4511023";
+
+    let deliveryBoyResponse = await fetch(
+      `http://localhost:3000/api/deliverypartners/${user_city}`
+    );
+    deliveryBoyResponse = await deliveryBoyResponse.json();
+    let deliveryBoyIds = deliveryBoyResponse.result.map((item) => item._id);
+    let deliveryBoy_id =
+      deliveryBoyIds[Math.floor(Math.random() * deliveryBoyIds.length)];
+    if (!deliveryBoy_id) {
+      alert("No delivery partners available in your city");
+      return false;
+    }
+
     let collection = {
       user_id,
       resto_id,
       foodItemIds,
-      deliveryBoy,
+      deliveryBoy_id,
       status: "confirmed",
       amount: totalAmount.toFixed(2),
     };
