@@ -14,19 +14,60 @@ const DeliveryPartner = () => {
   const [address, setAddress] = useState("");
   const [signupPhoneNumber, setSignupPhoneNumber] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     console.log(loginPhoneNumber, loginPassword);
+    let response = await fetch(
+      "http://localhost:3000/api/deliverypartners/login",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          phone: loginPhoneNumber,
+          password: loginPassword,
+        }),
+      }
+    );
+    response = await response.json();
+    if (response.success) {
+      alert("Successfully LoggedIn");
+      const { result } = response;
+      delete result.password;
+      localStorage.setItem("deliverypartners", JSON.stringify(result));
+    } else {
+      alert("Login failed");
+    }
   };
 
-  const handleSignup = () => {
+  const handleSignUp = async () => {
     console.log(
       name,
-      signupPhoneNumber,
       signupPassword,
       signupConfirmPassword,
       city,
-      address
+      address,
+      signupPhoneNumber
     );
+    let response = await fetch(
+      "http://localhost:3000/api/deliverypartners/signup",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          name,
+          password: signupPassword,
+          city,
+          address,
+          phone: signupPhoneNumber,
+        }),
+      }
+    );
+    response = await response.json();
+    if (response.success) {
+      alert("Successfully Signed Up");
+      const { result } = response;
+      delete result.password;
+      localStorage.setItem("deliverypartners", JSON.stringify(result));
+    } else {
+      alert("Failed to Sign Up");
+    }
   };
 
   return (
@@ -87,9 +128,7 @@ const DeliveryPartner = () => {
               type="password"
               placeholder="Enter Confirm Password"
               value={signupConfirmPassword}
-              onChange={(e) =>
-                setSignupConfirmPasswordignupConfirmPassword(e.target.value)
-              }
+              onChange={(e) => setSignupConfirmPassword(e.target.value)}
             />
           </div>
           <div className="input-wrapper">
@@ -120,7 +159,7 @@ const DeliveryPartner = () => {
             />
           </div>
           <div className="input-wrapper">
-            <button onClick={handleSignup} className="button">
+            <button onClick={handleSignUp} className="button">
               SignUp
             </button>
           </div>
