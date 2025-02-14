@@ -1,71 +1,78 @@
+"use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const CustomerHeader = (props) => {
-  // for cart
-  const cartStorage =
-    localStorage.getItem("cartData") &&
-    JSON.parse(localStorage.getItem("cartData"));
-  const [cartNumber, setCartNumber] = useState(cartStorage?.length);
-  const [cartItems, setCartItems] = useState(cartStorage);
-  // for user
-  const userStorage =
-    JSON.parse(localStorage.getItem("user")) &&
-    JSON.parse(localStorage.getItem("user"));
-  const [user, setUser] = useState(userStorage ? userStorage : undefined);
-  console.log(userStorage);
-
   const router = useRouter();
 
+  // Initialize state with safe defaults
+  const [cartNumber, setCartNumber] = useState(0);
+  const [cartItems, setCartItems] = useState([]);
+  const [user, setUser] = useState(undefined);
+
+  // Load initial values from localStorage (client-side only)
   useEffect(() => {
-    if (props.cartData) {
-      console.log("Props: ", props);
-      if (cartNumber) {
-        if (cartItems[0].food_id != props.cartData.food_id) {
-          localStorage.removeItem("cartData");
-          setCartNumber(1);
-          setCartItems([props.cartData]);
-          localStorage.setItem("cartData", JSON.stringify([props.cartData]));
-        } else {
-          let localCartItem = cartItems;
-          localCartItem.push(JSON.parse(JSON.stringify(props.cartData)));
-          setCartItems(localCartItem);
-          setCartNumber(cartNumber + 1);
-          localStorage.setItem("cartData", JSON.stringify(localCartItem));
-        }
-      } else {
-        setCartNumber(1);
-        setCartItems([props.cartData]);
-        localStorage.setItem("cartData", JSON.stringify([props.cartData]));
+    if (typeof window !== "undefined") {
+      const storedCart = localStorage.getItem("cartData");
+      if (storedCart) {
+        const parsedCart = JSON.parse(storedCart);
+        setCartNumber(parsedCart.length);
+        setCartItems(parsedCart);
       }
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    }
+  }, []);
+
+  // Update cart when props.cartData changes.
+  // Use a functional update to access the current cartItems without adding it as a dependency.
+  useEffect(() => {
+    if (props.cartData && typeof window !== "undefined") {
+      setCartItems((prevCartItems) => {
+        let newCart;
+        if (prevCartItems.length > 0) {
+          // If the first item's food_id is different, reset the cart
+          if (prevCartItems[0].food_id !== props.cartData.food_id) {
+            newCart = [props.cartData];
+          } else {
+            // Otherwise, add the new item
+            newCart = [...prevCartItems, props.cartData];
+          }
+        } else {
+          newCart = [props.cartData];
+        }
+        setCartNumber(newCart.length);
+        localStorage.setItem("cartData", JSON.stringify(newCart));
+        return newCart;
+      });
     }
   }, [props.cartData]);
 
+  // Update cart when props.removeCartData changes
   useEffect(() => {
-    if (props.removeCartData) {
-      let localCartItem = cartItems.filter((item) => {
-        return item._id != props.removeCartData;
+    if (props.removeCartData && typeof window !== "undefined") {
+      setCartItems((prevCartItems) => {
+        const newCart = prevCartItems.filter(
+          (item) => item._id !== props.removeCartData
+        );
+        setCartNumber(newCart.length);
+        if (newCart.length > 0) {
+          localStorage.setItem("cartData", JSON.stringify(newCart));
+        } else {
+          localStorage.removeItem("cartData");
+        }
+        return newCart;
       });
-      setCartItems(localCartItem);
-      setCartNumber(cartNumber - 1);
-      localStorage.setItem("cartData", JSON.stringify(localCartItem));
-      if (localCartItem.length == 0) {
-        localStorage.removeItem("cartData");
-      }
-    }
-  }, [props.removeCartData]);
-
-  useEffect(() => {
-    if (props.removeCartData) {
-      setCartItems([]);
-      setCartNumber(0);
-      localStorage.removeItem("cartData");
     }
   }, [props.removeCartData]);
 
   const handleLogOut = () => {
-    localStorage.removeItem("user");
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("user");
+    }
     setUser(undefined);
     router.push("/user-auth");
   };
@@ -99,9 +106,7 @@ const CustomerHeader = (props) => {
           </>
         )}
         <li>
-          <Link href={cartNumber ? "/cart" : "#"}>
-            Cart({cartNumber ? cartNumber : 0})
-          </Link>
+          <Link href={cartNumber ? "/cart" : "#"}>Cart({cartNumber})</Link>
         </li>
         <li>
           <Link href="/deliverypartner">Delivery Partner</Link>

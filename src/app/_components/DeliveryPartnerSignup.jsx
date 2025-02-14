@@ -27,16 +27,6 @@ const DeliveryPartnerSignup = () => {
       setError(false);
     }
 
-    console.log(
-      "SignUp Clicked",
-      name,
-      password,
-      confirmPassword,
-      city,
-      address,
-      phone
-    );
-
     let response = await fetch(
       "http://localhost:3000/api/deliverypartners/signup",
       {

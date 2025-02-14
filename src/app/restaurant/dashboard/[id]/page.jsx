@@ -1,10 +1,9 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-const EditFoodItem = ({ params }) => {
-  const id = params.id;
-  console.log("ID:", id);
+const EditFoodItem = () => {
+  const { id } = useParams();
 
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
@@ -14,8 +13,10 @@ const EditFoodItem = ({ params }) => {
   const router = useRouter();
 
   useEffect(() => {
-    handleLoadFoodItem();
-  }, []);
+    if (id) {
+      handleLoadFoodItem();
+    }
+  }, [id]);
 
   const handleLoadFoodItem = async () => {
     let response = await fetch(
@@ -23,7 +24,6 @@ const EditFoodItem = ({ params }) => {
     );
     response = await response.json();
     if (response.success) {
-      console.log(response.result);
       setName(response.result.name);
       setPrice(response.result.price);
       setPath(response.result.path);
@@ -32,7 +32,6 @@ const EditFoodItem = ({ params }) => {
   };
 
   const handleEditFood = async () => {
-    console.log(name, price, path, description);
     if (!name || !price || !path || !description) {
       setError(true);
       return false;
@@ -118,7 +117,7 @@ const EditFoodItem = ({ params }) => {
         </button>
       </div>
       <div className="input-wrapper">
-        <button onClick={() => router.push(`../dashboard`)} className="button">
+        <button onClick={() => router.push("../dashboard")} className="button">
           Back to Dashboard
         </button>
       </div>

@@ -34,17 +34,6 @@ const RestaurantSignup = () => {
     } else {
       setError(false);
     }
-
-    console.log(
-      "SignUp Clicked",
-      email,
-      password,
-      confPassword,
-      restaurantName,
-      city,
-      address,
-      contact
-    );
     let response = await fetch("http://localhost:3000/api/restaurant", {
       method: "POST",
       body: JSON.stringify({
@@ -57,7 +46,6 @@ const RestaurantSignup = () => {
       }),
     });
     response = await response.json();
-    console.log(response);
     if (response.success) {
       alert("Successfully Signed Up");
       const { result } = response;

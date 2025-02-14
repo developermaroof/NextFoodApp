@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 
 const Dashboard = () => {
   const [myOrders, setMyOrders] = useState([]);
-  console.log(myOrders);
 
   useEffect(() => {
     loadMyOrders();

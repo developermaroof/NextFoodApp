@@ -1,7 +1,8 @@
-import { useRouter } from "next/navigation";
+"use client";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
-const UserSignUp = (props) => {
+const UserSignUp = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,9 +12,9 @@ const UserSignUp = (props) => {
   const [contact, setContact] = useState("");
 
   const router = useRouter();
+  const searchParams = useSearchParams(); // Unwrap the search parameters
 
   const handleSignUp = async () => {
-    console.log(name, email, password, confirmPassword, city, address, contact);
     let response = await fetch("http://localhost:3000/api/user", {
       method: "POST",
       body: JSON.stringify({
@@ -32,7 +33,8 @@ const UserSignUp = (props) => {
       const { result } = response;
       delete result.password;
       localStorage.setItem("user", JSON.stringify(result));
-      if (props?.redirect?.order) {
+      // Use searchParams.get() to safely access the "order" property
+      if (searchParams?.get("order")) {
         router.push("/order");
       } else {
         router.push("/");
@@ -41,6 +43,7 @@ const UserSignUp = (props) => {
       alert("Failed to Sign Up");
     }
   };
+
   return (
     <div>
       <div className="input-wrapper">

@@ -8,7 +8,6 @@ const AddFoodItem = (props) => {
   const [error, setError] = useState(false);
 
   const handleAddFood = async () => {
-    console.log(name, price, path, description);
     if (!name || !price || !path || !description) {
       setError(true);
       return false;

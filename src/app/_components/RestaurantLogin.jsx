@@ -23,7 +23,6 @@ const RestaurantLogin = () => {
       }),
     });
     response = await response.json();
-    console.log(response);
 
     if (response.success) {
       const { result } = response;

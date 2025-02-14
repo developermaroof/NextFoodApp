@@ -1,14 +1,14 @@
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
-const UserLogin = (props) => {
+const UserLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const router = useRouter();
+  const searchParams = useSearchParams(); // Unwrap the search parameters
 
   const handleLogin = async () => {
-    console.log(email, password);
     let response = await fetch("http://localhost:3000/api/user/login", {
       method: "POST",
       body: JSON.stringify({
@@ -22,7 +22,8 @@ const UserLogin = (props) => {
       const { result } = response;
       delete result.password;
       localStorage.setItem("user", JSON.stringify(result));
-      if (props?.redirect?.order) {
+      // Use searchParams.get() to safely access the "order" property
+      if (searchParams?.get("order")) {
         router.push("/order");
       } else {
         router.push("/");

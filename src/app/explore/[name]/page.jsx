@@ -2,22 +2,29 @@
 import CustomerHeader from "@/app/_components/CustomerHeader";
 import Footer from "@/app/_components/Footer";
 import React, { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 
-const Details = (props) => {
-  const restaurantName = props.params.name;
+const Details = () => {
+  // Unwrap dynamic route params and search params
+  const params = useParams();
+  const searchParams = useSearchParams();
+
+  const restaurantName = params.name; // useParams() returns the resolved params
   const [restaurantDetails, setRestaurantDetails] = useState();
   const [foodItems, setFoodItems] = useState([]);
   const [cartData, setCartData] = useState();
-  const [cartStorage, setCartStorage] = useState(
-    JSON.parse(localStorage.getItem("cartData"))
-  );
+
+  // Lazy initialize cartStorage only on client
+  const [cartStorage, setCartStorage] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("cartData");
+      return stored ? JSON.parse(stored) : [];
+    }
+    return [];
+  });
+
   const [cartId, setCartId] = useState(
-    cartStorage
-      ? () =>
-          cartStorage.map((item) => {
-            return item._id;
-          })
-      : []
+    () => cartStorage.map((item) => item._id) || []
   );
   const [removeCartData, setRemoveCartData] = useState();
 
@@ -26,8 +33,7 @@ const Details = (props) => {
   }, []);
 
   const loadRestaurantDetails = async () => {
-    const id = props.searchParams.id;
-    console.log(id);
+    const id = searchParams.get("id");
     let response = await fetch(`http://localhost:3000/api/customer/${id}`);
     response = await response.json();
     if (response.success) {
@@ -38,17 +44,16 @@ const Details = (props) => {
 
   const handleAddToCart = (item) => {
     setCartData(item);
-    let localCartIds = cartId;
-    localCartIds.push(item._id);
-    setCartId(localCartIds);
-    setRemoveCartData();
+    const newCartIds = [...cartId, item._id];
+    setCartId(newCartIds);
+    setRemoveCartData(undefined);
   };
 
   const handleRemoveFromCart = (id) => {
     setRemoveCartData(id);
-    var localIds = cartId.filter((item) => item != id);
-    setCartData();
-    setCartId(localIds);
+    const updatedCartIds = cartId.filter((item) => item !== id);
+    setCartData(undefined);
+    setCartId(updatedCartIds);
   };
 
   return (
@@ -66,9 +71,9 @@ const Details = (props) => {
       <div className="food-item-wrapper">
         {foodItems.length > 0 ? (
           foodItems.map((item) => (
-            <div className="list-item">
+            <div className="list-item" key={item._id}>
               <div>
-                <img src={item.path} />
+                <img src={item.path} alt={item.name} />
               </div>
               <div>
                 <div>{item.name}</div>
