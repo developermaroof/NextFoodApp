@@ -6,15 +6,12 @@ const UserLogin = () => {
   const [password, setPassword] = useState("");
 
   const router = useRouter();
-  const searchParams = useSearchParams(); // Unwrap the search parameters
+  const searchParams = useSearchParams();
 
   const handleLogin = async () => {
     let response = await fetch("http://localhost:3000/api/user/login", {
       method: "POST",
-      body: JSON.stringify({
-        email,
-        password,
-      }),
+      body: JSON.stringify({ email, password }),
     });
     response = await response.json();
     if (response.success) {
@@ -22,7 +19,6 @@ const UserLogin = () => {
       const { result } = response;
       delete result.password;
       localStorage.setItem("user", JSON.stringify(result));
-      // Use searchParams.get() to safely access the "order" property
       if (searchParams?.get("order")) {
         router.push("/order");
       } else {
@@ -34,27 +30,30 @@ const UserLogin = () => {
   };
 
   return (
-    <div>
-      <div className="input-wrapper">
+    <div className="space-y-6">
+      <div>
         <input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="input-field"
           type="text"
           placeholder="Email"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </div>
-      <div className="input-wrapper">
+      <div>
         <input
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="input-field"
           type="password"
           placeholder="Password"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      <div className="submit-wrapper">
-        <button onClick={handleLogin} className="button">
+      <div>
+        <button
+          className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-lg transition-colors"
+          onClick={handleLogin}
+        >
           Login
         </button>
       </div>

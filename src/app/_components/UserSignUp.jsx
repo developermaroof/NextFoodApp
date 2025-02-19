@@ -12,7 +12,7 @@ const UserSignUp = () => {
   const [contact, setContact] = useState("");
 
   const router = useRouter();
-  const searchParams = useSearchParams(); // Unwrap the search parameters
+  const searchParams = useSearchParams();
 
   const handleSignUp = async () => {
     let response = await fetch("http://localhost:3000/api/user", {
@@ -33,7 +33,6 @@ const UserSignUp = () => {
       const { result } = response;
       delete result.password;
       localStorage.setItem("user", JSON.stringify(result));
-      // Use searchParams.get() to safely access the "order" property
       if (searchParams?.get("order")) {
         router.push("/order");
       } else {
@@ -45,75 +44,77 @@ const UserSignUp = () => {
   };
 
   return (
-    <div>
-      <div className="input-wrapper">
-        <input
-          className="input-field"
-          type="text"
-          placeholder="Enter Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <input
+            type="text"
+            placeholder="Enter Name"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <div>
+          <input
+            type="email"
+            placeholder="Enter Email Address"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div>
+          <input
+            type="password"
+            placeholder="Enter Password"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <div>
+          <input
+            type="password"
+            placeholder="Enter Confirm Password"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </div>
       </div>
-      <div className="input-wrapper">
+
+      <div className="space-y-6">
         <input
-          className="input-field"
-          type="email"
-          placeholder="Enter Email Address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-      <div className="input-wrapper">
-        <input
-          className="input-field"
-          type="password"
-          placeholder="Enter Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-      <div className="input-wrapper">
-        <input
-          className="input-field"
-          type="password"
-          placeholder="Enter Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
-      </div>
-      <div className="input-wrapper">
-        <input
-          className="input-field"
           type="text"
           placeholder="Enter City"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           value={city}
           onChange={(e) => setCity(e.target.value)}
         />
-      </div>
-      <div className="input-wrapper">
+
         <input
-          className="input-field"
           type="text"
           placeholder="Enter Address"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
         />
-      </div>
-      <div className="input-wrapper">
+
         <input
-          className="input-field"
           type="tel"
           placeholder="Enter Contact Number"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           value={contact}
           onChange={(e) => setContact(e.target.value)}
         />
       </div>
-      <div className="input-wrapper">
-        <button onClick={handleSignUp} className="button">
-          SignUp
-        </button>
-      </div>
+      <button
+        className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-lg transition-colors"
+        onClick={handleSignUp}
+      >
+        Create Account
+      </button>
     </div>
   );
 };

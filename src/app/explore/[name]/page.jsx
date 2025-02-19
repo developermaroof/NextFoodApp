@@ -57,44 +57,90 @@ const Details = () => {
   };
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <CustomerHeader cartData={cartData} removeCartData={removeCartData} />
-      <div className="restaurant-page-banner">
-        <h1>{decodeURI(restaurantName)}</h1>
+
+      {/* Restaurant Banner */}
+      <div className="bg-gradient-to-r from-amber-400 to-orange-500 py-12 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className="text-4xl md:text-6xl font-bold text-white">
+            {decodeURI(restaurantName)}
+          </h1>
+        </div>
       </div>
-      <div className="detail-wrapper">
-        <h4>Contact: {restaurantDetails?.contact}</h4>
-        <h4>City: {restaurantDetails?.city}</h4>
-        <h4>Address: {restaurantDetails?.address}</h4>
-        <h4>Email: {restaurantDetails?.email}</h4>
+
+      {/* Restaurant Details Card */}
+      <div className="max-w-4xl mx-auto my-8 p-6 bg-white rounded-xl shadow-md">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+          <h4 className="font-semibold">Contact:</h4>
+          <p>{restaurantDetails?.contact}</p>
+          <h4 className="font-semibold">City:</h4>
+          <p>{restaurantDetails?.city}</p>
+          <h4 className="font-semibold">Address:</h4>
+          <p>{restaurantDetails?.address}</p>
+          <h4 className="font-semibold">Email:</h4>
+          <p>{restaurantDetails?.email}</p>
+        </div>
       </div>
-      <div className="food-item-wrapper">
+
+      {/* Food Items List */}
+      <div className="max-w-6xl mx-auto px-4 py-8">
         {foodItems.length > 0 ? (
-          foodItems.map((item) => (
-            <div className="list-item" key={item._id}>
-              <div>
-                <img src={item.path} alt={item.name} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {foodItems.map((item) => (
+              <div
+                key={item._id}
+                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 flex"
+              >
+                {/* Food Image */}
+                <div className="w-24 h-24 md:w-32 md:h-32 flex-shrink-0">
+                  <img
+                    src={item.path}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {/* Food Details */}
+                <div className="p-4 flex flex-col justify-between flex-grow">
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-1">
+                      {item.name}
+                    </h3>
+                    <p className="text-gray-600 mb-2">{item.description}</p>
+                    <p className="text-gray-700 font-medium">
+                      Price: {item.price}
+                    </p>
+                  </div>
+                  <div>
+                    {cartId.includes(item._id) ? (
+                      <button
+                        onClick={() => handleRemoveFromCart(item._id)}
+                        className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-colors mt-4"
+                      >
+                        Remove from Cart
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleAddToCart(item)}
+                        className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 rounded-lg transition-colors mt-4"
+                      >
+                        Add to Cart
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div>
-                <div>{item.name}</div>
-                <div>{item.price}</div>
-                <div className="description">{item.description}</div>
-                {cartId.includes(item._id) ? (
-                  <button onClick={() => handleRemoveFromCart(item._id)}>
-                    Remove from cart
-                  </button>
-                ) : (
-                  <button onClick={() => handleAddToCart(item)}>
-                    Add to Cart
-                  </button>
-                )}
-              </div>
-            </div>
-          ))
+            ))}
+          </div>
         ) : (
-          <h1>No food items added for now...</h1>
+          <div className="text-center py-20">
+            <h1 className="text-2xl font-semibold text-gray-700">
+              No food items added for now...
+            </h1>
+          </div>
         )}
       </div>
+
       <Footer />
     </div>
   );

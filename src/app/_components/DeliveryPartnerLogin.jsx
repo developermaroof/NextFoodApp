@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -27,7 +28,7 @@ const DeliveryPartnerLogin = () => {
     response = await response.json();
 
     if (response.success) {
-      alert("Successfully LoggedIn");
+      alert("Successfully Logged In");
       const { result } = response;
       delete result.password;
       localStorage.setItem("deliverypartners", JSON.stringify(result));
@@ -38,40 +39,40 @@ const DeliveryPartnerLogin = () => {
   };
 
   return (
-    <>
-      <h1>Login</h1>
+    <div className="space-y-6">
       <div>
-        <div className="input-wrapper">
-          <input
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="input-field"
-            type="tel"
-            placeholder="Enter Phone Number"
-          />
-          {error && !phone && (
-            <span className="input-error">Phone Number is Required</span>
-          )}
-        </div>
-        <div className="input-wrapper">
-          <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="input-field"
-            type="password"
-            placeholder="Password"
-          />
-          {error && !password && (
-            <span className="input-error">Password is Required</span>
-          )}
-        </div>
-        <div className="input-wrapper">
-          <button onClick={handleLogin} className="button">
-            Login
-          </button>
-        </div>
+        <input
+          type="tel"
+          placeholder="Enter Phone Number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+        />
+        {error && !phone && (
+          <span className="text-red-500 text-sm">Phone Number is Required</span>
+        )}
       </div>
-    </>
+      <div>
+        <input
+          type="password"
+          placeholder="Enter Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+        />
+        {error && !password && (
+          <span className="text-red-500 text-sm">Password is Required</span>
+        )}
+      </div>
+      <div>
+        <button
+          onClick={handleLogin}
+          className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-lg transition-colors"
+        >
+          Login
+        </button>
+      </div>
+    </div>
   );
 };
 

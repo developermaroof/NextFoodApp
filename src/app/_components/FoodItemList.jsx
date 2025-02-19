@@ -1,8 +1,9 @@
+"use client";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const FoodItemList = () => {
-  const [foodItems, setFoodItems] = useState();
+  const [foodItems, setFoodItems] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -40,46 +41,76 @@ const FoodItemList = () => {
   };
 
   return (
-    <div>
-      <h1>Food Items List</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>S.No</th>
-            <th>Food Name</th>
-            <th>Price</th>
-            <th>Description</th>
-            <th>Image</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {foodItems &&
-            foodItems.map((item, key) => (
-              <tr key={key}>
-                <td>{key + 1}</td>
-                <td>{item.name}</td>
-                <td>{item.price}</td>
-                <td>{item.description}</td>
-                <td>
-                  <img src={item.path} alt="Image" />
-                </td>
-                <td>
-                  <button
-                    onClick={() =>
-                      router.push(`/restaurant/dashboard/${item._id}`)
-                    }
-                  >
-                    Edit
-                  </button>
-                  <button onClick={() => handleDeleteFoodItem(item._id)}>
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+    <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-lg p-6">
+      <h1 className="text-2xl font-bold text-gray-800 mb-4">Food Items List</h1>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-amber-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                S.No
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                Food Name
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                Price
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                Description
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                Image
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {foodItems &&
+              foodItems.map((item, key) => (
+                <tr key={key}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    {key + 1}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    {item.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    {item.price}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    {item.description}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <img
+                      src={item.path}
+                      alt="Food"
+                      className="h-16 w-16 object-cover rounded-md"
+                    />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 space-x-2">
+                    <button
+                      onClick={() =>
+                        router.push(`/restaurant/dashboard/${item._id}`)
+                      }
+                      className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-3 py-1 rounded transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteFoodItem(item._id)}
+                      className="bg-red-500 hover:bg-red-600 text-white font-semibold px-3 py-1 rounded transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

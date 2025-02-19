@@ -9,18 +9,24 @@ const UserAuth = () => {
   const [login, setLogin] = useState(true);
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <CustomerHeader />
-      <div className="container">
-        <h1>{login ? "User Login" : "User SignUp"}</h1>
-        {login ? <UserLogin /> : <UserSignUp />}
-        <button className="button-link" onClick={() => setLogin(!login)}>
-          {login
-            ? "Do not have an account? SignUp"
-            : "Already have an account? Login"}
-        </button>
-      </div>
-
+      <main className="flex-grow bg-gradient-to-b from-orange-50 to-amber-50 py-12">
+        <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+            {login ? "Welcome Back!" : "Create Account"}
+          </h1>
+          {login ? <UserLogin /> : <UserSignUp />}
+          <button
+            onClick={() => setLogin(!login)}
+            className="mt-6 text-amber-600 hover:text-amber-700 text-sm font-medium w-full text-center"
+          >
+            {login
+              ? "Don't have an account? Sign Up"
+              : "Already have an account? Log In"}
+          </button>
+        </div>
+      </main>
       <Footer />
     </div>
   );

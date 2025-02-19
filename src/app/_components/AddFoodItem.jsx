@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 
 const AddFoodItem = (props) => {
@@ -14,11 +15,8 @@ const AddFoodItem = (props) => {
     } else {
       setError(false);
     }
-    let food_id;
     const restaurantData = JSON.parse(localStorage.getItem("restaurantUser"));
-    if (restaurantData) {
-      food_id = restaurantData._id;
-    }
+    const food_id = restaurantData?._id;
     let response = await fetch("http://localhost:3000/api/restaurant/foods", {
       method: "POST",
       body: JSON.stringify({ name, price, path, description, food_id }),
@@ -33,61 +31,70 @@ const AddFoodItem = (props) => {
   };
 
   return (
-    <div className="container">
-      <h1>Add New Food Item</h1>
-      <div className="input-wrapper">
-        <input
-          className="input-field"
-          type="text"
-          placeholder="Enter Food Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        {error && !name && (
-          <span className="input-error">Please Enter Food Name</span>
-        )}
+    <div className="max-w-md mx-auto bg-white rounded-xl shadow-md p-8">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Add New Food Item
+      </h1>
+      <div className="space-y-6">
+        <div>
+          <input
+            type="text"
+            placeholder="Enter Food Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+          />
+          {error && !name && (
+            <span className="text-red-500 text-sm">Please Enter Food Name</span>
+          )}
+        </div>
+        <div>
+          <input
+            type="text"
+            placeholder="Enter Price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+          />
+          {error && !price && (
+            <span className="text-red-500 text-sm">Please Enter Price</span>
+          )}
+        </div>
+        <div>
+          <input
+            type="text"
+            placeholder="Enter Image Path"
+            value={path}
+            onChange={(e) => setPath(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+          />
+          {error && !path && (
+            <span className="text-red-500 text-sm">
+              Please Enter Image Path
+            </span>
+          )}
+        </div>
+        <div>
+          <input
+            type="text"
+            placeholder="Enter Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+          />
+          {error && !description && (
+            <span className="text-red-500 text-sm">
+              Please Enter Description
+            </span>
+          )}
+        </div>
       </div>
-      <div className="input-wrapper">
-        <input
-          className="input-field"
-          type="text"
-          placeholder="Enter Price"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
-        {error && !price && (
-          <span className="input-error">Please Enter Price</span>
-        )}
-      </div>
-      <div className="input-wrapper">
-        <input
-          className="input-field"
-          type="text"
-          placeholder="Enter Image Path"
-          value={path}
-          onChange={(e) => setPath(e.target.value)}
-        />
-        {error && !path && (
-          <span className="input-error">Please Enter Image Path</span>
-        )}
-      </div>
-      <div className="input-wrapper">
-        <input
-          className="input-field"
-          type="text"
-          placeholder="Enter Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        {error && !description && (
-          <span className="input-error">Please Enter Description</span>
-        )}
-      </div>
-      <div className="input-wrapper">
-        <button onClick={handleAddFood} className="button">
-          Add
-        </button>
-      </div>
+      <button
+        onClick={handleAddFood}
+        className="mt-6 w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-lg transition-colors"
+      >
+        Add
+      </button>
     </div>
   );
 };

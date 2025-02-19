@@ -1,3 +1,4 @@
+"use client";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -21,13 +22,13 @@ const RestaurantSignup = () => {
       setPasswordError(false);
     }
     if (
-      (!email,
-      !password,
-      !confPassword,
-      !restaurantName,
-      !city,
-      !address,
-      !contact)
+      !email ||
+      !password ||
+      !confPassword ||
+      !restaurantName ||
+      !city ||
+      !address ||
+      !contact
     ) {
       setError(true);
       return false;
@@ -52,110 +53,119 @@ const RestaurantSignup = () => {
       delete result.password;
       localStorage.setItem("restaurantUser", JSON.stringify(result));
       router.push("/restaurant/dashboard");
+    } else {
+      alert("Failed to Sign Up");
     }
   };
 
   return (
-    <>
-      <h1>SignUp</h1>
-      <div>
-        <div className="input-wrapper">
+    <div className="space-y-6">
+      <h1 className="text-2xl font-semibold text-center text-gray-800 mb-4">
+        Sign Up
+      </h1>
+      <div className="space-y-6">
+        <div>
           <input
-            className="input-field"
             type="email"
-            placeholder="Enter EmailID"
+            placeholder="Enter Email ID"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
           {error && !email && (
-            <span className="input-error">Email is Required</span>
+            <span className="text-red-500 text-sm">Email is Required</span>
           )}
         </div>
-        <div className="input-wrapper">
+        <div>
           <input
-            className="input-field"
             type="password"
             placeholder="Enter Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
           {error && !password && (
-            <span className="input-error">Password is Required</span>
+            <span className="text-red-500 text-sm">Password is Required</span>
           )}
           {passwordError && (
-            <span className="input-error">Passwords do not match</span>
+            <span className="text-red-500 text-sm">Passwords do not match</span>
           )}
         </div>
-        <div className="input-wrapper">
+        <div>
           <input
-            className="input-field"
             type="password"
             placeholder="Confirm Password"
             value={confPassword}
             onChange={(e) => setConfPassword(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
           {error && !confPassword && (
-            <span className="input-error">Password is Required</span>
+            <span className="text-red-500 text-sm">
+              Confirm Password is Required
+            </span>
           )}
           {passwordError && (
-            <span className="input-error">Passwords do not match</span>
+            <span className="text-red-500 text-sm">Passwords do not match</span>
           )}
         </div>
-        <div className="input-wrapper">
+        <div>
           <input
-            className="input-field"
             type="text"
             placeholder="Enter Restaurant Name"
             value={restaurantName}
             onChange={(e) => setRestaurantName(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
           {error && !restaurantName && (
-            <span className="input-error">Restaurant Name is Required</span>
+            <span className="text-red-500 text-sm">
+              Restaurant Name is Required
+            </span>
           )}
         </div>
-        <div className="input-wrapper">
+        <div>
           <input
-            className="input-field"
             type="text"
             placeholder="Enter City"
             value={city}
             onChange={(e) => setCity(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
           {error && !city && (
-            <span className="input-error">City is Required</span>
+            <span className="text-red-500 text-sm">City is Required</span>
           )}
         </div>
-        <div className="input-wrapper">
+        <div>
           <input
-            className="input-field"
             type="text"
             placeholder="Enter Address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
           {error && !address && (
-            <span className="input-error">Address is Required</span>
+            <span className="text-red-500 text-sm">Address is Required</span>
           )}
         </div>
-        <div className="input-wrapper">
+        <div>
           <input
-            className="input-field"
             type="number"
             placeholder="Enter Contact No."
             value={contact}
             onChange={(e) => setContact(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
           {error && !contact && (
-            <span className="input-error">Contact No is Required</span>
+            <span className="text-red-500 text-sm">Contact No is Required</span>
           )}
         </div>
-        <div className="input-wrapper">
-          <button className="button" onClick={handleSignUp}>
-            SignUp
-          </button>
-        </div>
       </div>
-    </>
+      <button
+        onClick={handleSignUp}
+        className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-lg transition-colors"
+      >
+        Sign Up
+      </button>
+    </div>
   );
 };
 

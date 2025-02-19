@@ -7,23 +7,28 @@ import Footer from "../_components/Footer";
 
 const Restaurant = () => {
   const [login, setLogin] = useState(true);
-  return (
-    <>
-      <div className="container">
-        <RestaurantHeader />
-        <h1>Restaurant Login/Signup Page</h1>
-        {login ? <RestaurantLogin /> : <RestaurantSignup />}
 
-        <div>
-          <button className="button-link" onClick={() => setLogin(!login)}>
+  return (
+    <div className="min-h-screen flex flex-col">
+      <RestaurantHeader />
+      <main className="flex-grow bg-gradient-to-b from-orange-50 to-amber-50 py-12">
+        <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+            {login ? "Welcome Back!" : "Create Account"}
+          </h1>
+          {login ? <RestaurantLogin /> : <RestaurantSignup />}
+          <button
+            onClick={() => setLogin(!login)}
+            className="mt-6 text-amber-600 hover:text-amber-700 text-sm font-medium w-full text-center"
+          >
             {login
-              ? "Don't have an account? SignUp"
+              ? "Don't have an account? Sign Up"
               : "Already have an account? Login"}
           </button>
         </div>
-        <Footer />
-      </div>
-    </>
+      </main>
+      <Footer />
+    </div>
   );
 };
 

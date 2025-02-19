@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -8,7 +9,6 @@ const DeliveryPartnerSignup = () => {
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
-
   const router = useRouter();
   const [error, setError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
@@ -20,7 +20,7 @@ const DeliveryPartnerSignup = () => {
     } else {
       setPasswordError(false);
     }
-    if ((!name, !password, !confirmPassword, !city, !address, !phone)) {
+    if (!name || !password || !confirmPassword || !city || !address || !phone) {
       setError(true);
       return false;
     } else {
@@ -54,95 +54,100 @@ const DeliveryPartnerSignup = () => {
   };
 
   return (
-    <>
-      <h1>SignUp</h1>
-      <div>
-        <div className="input-wrapper">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-6">
+        <div>
           <input
-            className="input-field"
             type="text"
             placeholder="Enter Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
           {error && !name && (
-            <span className="input-error">Please Enter Name</span>
+            <span className="text-red-500 text-sm">Please Enter Name</span>
           )}
         </div>
-
-        <div className="input-wrapper">
+        <div>
           <input
-            className="input-field"
             type="password"
             placeholder="Enter Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
           {error && !password && (
-            <span className="input-error">Please Enter Password</span>
+            <span className="text-red-500 text-sm">Please Enter Password</span>
           )}
           {passwordError && (
-            <span className="input-error">Passwords do not match</span>
+            <span className="text-red-500 text-sm">Passwords do not match</span>
           )}
         </div>
-        <div className="input-wrapper">
+        <div>
           <input
-            className="input-field"
             type="password"
             placeholder="Enter Confirm Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
           {error && !confirmPassword && (
-            <span className="input-error">Please Enter Confirm Password</span>
+            <span className="text-red-500 text-sm">
+              Please Enter Confirm Password
+            </span>
           )}
           {passwordError && (
-            <span className="input-error">Passwords do not match</span>
+            <span className="text-red-500 text-sm">Passwords do not match</span>
           )}
         </div>
-        <div className="input-wrapper">
+      </div>
+      <div className="space-y-6">
+        <div>
           <input
-            className="input-field"
             type="text"
             placeholder="Enter City"
             value={city}
             onChange={(e) => setCity(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
           {error && !city && (
-            <span className="input-error">Please Enter City</span>
+            <span className="text-red-500 text-sm">Please Enter City</span>
           )}
         </div>
-        <div className="input-wrapper">
+        <div>
           <input
-            className="input-field"
             type="text"
             placeholder="Enter Address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
           {error && !address && (
-            <span className="input-error">Please Enter Address</span>
+            <span className="text-red-500 text-sm">Please Enter Address</span>
           )}
         </div>
-        <div className="input-wrapper">
+        <div>
           <input
-            className="input-field"
             type="tel"
             placeholder="Enter Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
           {error && !phone && (
-            <span className="input-error">Please Enter Phone Number</span>
+            <span className="text-red-500 text-sm">
+              Please Enter Phone Number
+            </span>
           )}
         </div>
-        <div className="input-wrapper">
-          <button onClick={handleSignUp} className="button">
-            SignUp
-          </button>
-        </div>
       </div>
-    </>
+      <button
+        onClick={handleSignUp}
+        className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-lg transition-colors"
+      >
+        Create Account
+      </button>
+    </div>
   );
 };
 

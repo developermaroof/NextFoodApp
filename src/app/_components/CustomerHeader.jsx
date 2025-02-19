@@ -28,17 +28,14 @@ const CustomerHeader = (props) => {
   }, []);
 
   // Update cart when props.cartData changes.
-  // Use a functional update to access the current cartItems without adding it as a dependency.
   useEffect(() => {
     if (props.cartData && typeof window !== "undefined") {
       setCartItems((prevCartItems) => {
         let newCart;
         if (prevCartItems.length > 0) {
-          // If the first item's food_id is different, reset the cart
           if (prevCartItems[0].food_id !== props.cartData.food_id) {
             newCart = [props.cartData];
           } else {
-            // Otherwise, add the new item
             newCart = [...prevCartItems, props.cartData];
           }
         } else {
@@ -78,44 +75,99 @@ const CustomerHeader = (props) => {
   };
 
   return (
-    <div className="header-wrapper">
-      <div className="logo">
-        <img style={{ width: "100px" }} src="/logo.png" alt="Logo" />
+    <header className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <Link href="/" className="flex items-center">
+            <img
+              src="/logo.png"
+              alt="Food Delivery Icon"
+              className="h-10 w-10 rounded-full"
+            />
+            <span className="ml-2 text-xl font-bold text-gray-800">
+              FoodApp
+            </span>
+          </Link>
+
+          <nav className="hidden md:flex space-x-8">
+            <ul className="flex items-center space-x-6">
+              {/* ... rest of list items */}
+              <li>
+                <Link
+                  href="/"
+                  className="text-gray-600 hover:text-amber-600 transition-colors font-medium"
+                >
+                  Home
+                </Link>
+              </li>
+              {user ? (
+                <>
+                  <li>
+                    <Link
+                      href="/myprofile"
+                      className="text-gray-600 hover:text-amber-600 transition-colors font-medium"
+                    >
+                      {user?.name}
+                    </Link>
+                  </li>
+                  <li>
+                    <button
+                      onClick={handleLogOut}
+                      className="flex items-center bg-amber-100 px-4 py-2 rounded-full hover:bg-amber-200 transition-colors"
+                    >
+                      LogOut
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link
+                      href="/user-auth"
+                      className="text-gray-600 hover:text-amber-600 transition-colors font-medium"
+                    >
+                      Login
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/user-auth"
+                      className="text-gray-600 hover:text-amber-600 transition-colors font-medium"
+                    >
+                      SignUp
+                    </Link>
+                  </li>
+                </>
+              )}
+              <li>
+                <Link
+                  href={cartNumber ? "/cart" : "#"}
+                  className="flex items-center bg-amber-100 px-4 py-2 rounded-full hover:bg-amber-200 transition-colors"
+                >
+                  🛒 Cart ({cartNumber})
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/deliverypartner"
+                  className="text-gray-600 hover:text-amber-600 transition-colors font-medium"
+                >
+                  Delivery Partner
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/restaurant"
+                  className="text-gray-600 hover:text-amber-600 transition-colors font-medium"
+                >
+                  Add Restaurant
+                </Link>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </div>
-      <ul>
-        <li>
-          <Link href="/">Home</Link>
-        </li>
-        {user ? (
-          <>
-            <li>
-              <Link href="/myprofile">{user?.name}</Link>
-            </li>
-            <li>
-              <button onClick={handleLogOut}>LogOut</button>
-            </li>
-          </>
-        ) : (
-          <>
-            <li>
-              <Link href="/user-auth">Login</Link>
-            </li>
-            <li>
-              <Link href="/user-auth">SignUp</Link>
-            </li>
-          </>
-        )}
-        <li>
-          <Link href={cartNumber ? "/cart" : "#"}>Cart({cartNumber})</Link>
-        </li>
-        <li>
-          <Link href="/deliverypartner">Delivery Partner</Link>
-        </li>
-        <li>
-          <Link href="/restaurant">Add Restaurant</Link>
-        </li>
-      </ul>
-    </div>
+    </header>
   );
 };
 
