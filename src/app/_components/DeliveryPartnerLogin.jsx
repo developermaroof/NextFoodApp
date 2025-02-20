@@ -15,16 +15,13 @@ const DeliveryPartnerLogin = () => {
     } else {
       setError(false);
     }
-    let response = await fetch(
-      "http://localhost:3000/api/deliverypartners/login",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          phone,
-          password,
-        }),
-      }
-    );
+    let response = await fetch("/api/deliverypartners/login", {
+      method: "POST",
+      body: JSON.stringify({
+        phone,
+        password,
+      }),
+    });
     response = await response.json();
 
     if (response.success) {

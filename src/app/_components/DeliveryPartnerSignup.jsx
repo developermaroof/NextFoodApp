@@ -27,19 +27,16 @@ const DeliveryPartnerSignup = () => {
       setError(false);
     }
 
-    let response = await fetch(
-      "http://localhost:3000/api/deliverypartners/signup",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          name,
-          password,
-          city,
-          address,
-          phone,
-        }),
-      }
-    );
+    let response = await fetch("/api/deliverypartners/signup", {
+      method: "POST",
+      body: JSON.stringify({
+        name,
+        password,
+        city,
+        address,
+        phone,
+      }),
+    });
     response = await response.json();
 
     if (response.success) {

@@ -15,7 +15,7 @@ const Dashboard = () => {
       localStorage.getItem("deliverypartners")
     );
     let response = await fetch(
-      `http://localhost:3000/api/deliverypartners/orders/${deliveryPartnerStorage._id}`
+      `/api/deliverypartners/orders/${deliveryPartnerStorage._id}`
     );
     response = await response.json();
     if (response.success) {

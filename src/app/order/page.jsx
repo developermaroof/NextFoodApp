@@ -41,9 +41,7 @@ const Order = () => {
     let foodItemIds = cart.map((item) => item._id).toString();
     let resto_id = cart[0].food_id;
 
-    let deliveryBoyResponse = await fetch(
-      `http://localhost:3000/api/deliverypartners/${user_city}`
-    );
+    let deliveryBoyResponse = await fetch(`/api/deliverypartners/${user_city}`);
     deliveryBoyResponse = await deliveryBoyResponse.json();
     let deliveryBoyIds = deliveryBoyResponse.result.map((item) => item._id);
     let deliveryBoy_id =
@@ -61,7 +59,7 @@ const Order = () => {
       status: "confirmed",
       amount: totalAmount.toFixed(2),
     };
-    let response = await fetch("http://localhost:3000/api/order", {
+    let response = await fetch("/api/order", {
       method: "POST",
       body: JSON.stringify(collection),
     });
