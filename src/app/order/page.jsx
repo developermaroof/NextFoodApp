@@ -5,32 +5,42 @@ import Footer from "../_components/Footer";
 import { useRouter } from "next/navigation";
 
 const Order = () => {
-  const [userStorage, setUserStorage] = useState(
-    JSON.parse(localStorage.getItem("user"))
-  );
-  const [cartStorage, setCartStorage] = useState(() => {
-    const data = localStorage.getItem("cartData");
-    return data ? JSON.parse(data) : [];
-  });
+  const [userStorage, setUserStorage] = useState(null);
+  const [cartStorage, setCartStorage] = useState([]);
+  const [removeCartData, setRemoveCartData] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Client-side check
+    if (typeof window !== "undefined") {
+      const userData = localStorage.getItem("user");
+      setUserStorage(userData ? JSON.parse(userData) : null);
+
+      const cartData = localStorage.getItem("cartData");
+      setCartStorage(cartData ? JSON.parse(cartData) : []);
+    }
+  }, []);
+
   const total = cartStorage.reduce((sum, item) => {
     const numericPrice = Number(String(item.price).replace(/[^0-9.]/g, ""));
     return sum + (isNaN(numericPrice) ? 0 : numericPrice);
   }, 0);
-
-  const [removeCartData, setRemoveCartData] = useState(false);
-  const router = useRouter();
 
   // Tax calculation (5% example)
   const taxRate = 5;
   const tax = (total * taxRate) / 100;
   const delivery = 200;
   const totalAmount = total + tax + delivery;
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
-    if (!total) {
+    if (mounted && total === 0 && cartStorage.length === 0) {
       router.push("/");
     }
-  }, [total]);
+  }, [mounted, total, cartStorage]);
 
   const handleOrderNow = async () => {
     const userData = JSON.parse(localStorage.getItem("user"));
@@ -72,6 +82,19 @@ const Order = () => {
       alert("Failed to Place Order");
     }
   };
+
+  // Show loading state while data is being fetched
+  if (!userStorage || cartStorage.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <CustomerHeader />
+        <main className="container mx-auto px-4 py-8 flex-grow text-center">
+          Loading...
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
