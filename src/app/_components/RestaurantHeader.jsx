@@ -67,14 +67,6 @@ const RestaurantHeader = () => {
                       Logout
                     </button>
                   </li>
-                  <li>
-                    <Link
-                      href="/restaurant/profile"
-                      className="text-gray-600 hover:text-amber-600 transition-colors font-medium"
-                    >
-                      Profile
-                    </Link>
-                  </li>
                 </>
               ) : (
                 <li>

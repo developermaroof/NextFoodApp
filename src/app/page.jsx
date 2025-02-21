@@ -3,19 +3,26 @@ import { useEffect, useState } from "react";
 import CustomerHeader from "./_components/CustomerHeader";
 import Footer from "./_components/Footer";
 import { useRouter } from "next/navigation";
+import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 import "./globals.css";
 
 export default function Home() {
   const [locations, setLocations] = useState([]);
-  const [restaurants, setRestaurants] = useState([]);
+  // Initialize restaurants as null to indicate "not fetched yet"
+  const [restaurants, setRestaurants] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [showLocations, setShowLocations] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
   useEffect(() => {
-    loadLocations();
-    loadRestaurants();
+    const timer = setTimeout(() => {
+      loadLocations();
+      loadRestaurants();
+    }, 300); // 300ms delay
+    return () => clearTimeout(timer);
   }, []);
 
   const loadLocations = async () => {
@@ -27,16 +34,33 @@ export default function Home() {
   };
 
   const loadRestaurants = async (params) => {
-    let url = "/api/customer";
-    if (params?.location) {
-      url = url + "?location=" + encodeURIComponent(params.location);
-    } else if (params?.restaurant) {
-      url = url + "?restaurant=" + encodeURIComponent(params.restaurant);
-    }
-    let response = await fetch(url);
-    response = await response.json();
-    if (response.success) {
-      setRestaurants(response.result);
+    setLoading(true);
+    try {
+      let url = "/api/customer";
+      if (params?.location) {
+        url += "?location=" + encodeURIComponent(params.location);
+      } else if (params?.restaurant) {
+        url += "?restaurant=" + encodeURIComponent(params.restaurant);
+      }
+      const res = await fetch(url);
+      if (!res.ok) {
+        console.error("API route not available, status:", res.status);
+        // Ensure restaurants is set to empty array if there's an error
+        setRestaurants([]);
+        return;
+      }
+      const response = await res.json();
+      if (response.success) {
+        setRestaurants(response.result);
+      } else {
+        console.error("Fetch error:", response);
+        setRestaurants([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch restaurants:", error);
+      setRestaurants([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,52 +127,76 @@ export default function Home() {
       {/* Restaurant List */}
       <main className="flex-grow bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8">
-            {restaurants.length
-              ? "Popular Restaurants"
-              : "No Restaurants Found"}
-          </h2>
+          {loading || restaurants === null ? (
+            <SkeletonTheme baseColor="#f5f5f5" highlightColor="#db9721">
+              <Skeleton height={36} width={300} className="mb-8" />
+            </SkeletonTheme>
+          ) : (
+            <h2 className="text-3xl font-bold text-gray-800 mb-8">
+              {restaurants.length
+                ? "Popular Restaurants"
+                : "No Restaurants Found"}
+            </h2>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {restaurants.map((item) => (
-              <div
-                onClick={() =>
-                  router.push(`explore/${item.restaurantName}?id=${item._id}`)
-                }
-                key={item._id}
-                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
-              >
-                <div className="p-6">
-                  <div className="flex flex-col gap-4">
-                    <div className="flex-grow">
-                      <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                        {item.restaurantName}
-                      </h3>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="bg-amber-100 text-amber-800 text-sm px-2 py-1 rounded">
-                          {item.city}
-                        </span>
-                        <span className="bg-gray-100 text-gray-600 text-sm px-2 py-1 rounded">
-                          {item.cuisineType || "Multi-cuisine"}
-                        </span>
+            {loading || restaurants === null
+              ? Array.from({ length: 4 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="bg-white rounded-xl shadow-md overflow-hidden p-6"
+                  >
+                    <SkeletonTheme baseColor="#f5f5f5" highlightColor="#db9721">
+                      <Skeleton height={24} width="60%" className="mb-2" />
+                      <div className="flex gap-2 mb-2">
+                        <Skeleton height={20} width={50} />
+                        <Skeleton height={20} width={80} />
                       </div>
-                      <p className="text-gray-600 mb-2">
-                        <span className="font-medium">Address:</span>{" "}
-                        {item.address}
-                      </p>
-                      <div className="flex items-center gap-4 text-gray-600">
-                        <span className="flex items-center gap-1">
-                          📞 {item.contact}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          📧 {item.email}
-                        </span>
+                      <Skeleton count={2} />
+                    </SkeletonTheme>
+                  </div>
+                ))
+              : restaurants.map((item) => (
+                  <div
+                    onClick={() =>
+                      router.push(
+                        `explore/${item.restaurantName}?id=${item._id}`
+                      )
+                    }
+                    key={item._id}
+                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                  >
+                    <div className="p-6">
+                      <div className="flex flex-col gap-4">
+                        <div className="flex-grow">
+                          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                            {item.restaurantName}
+                          </h3>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="bg-amber-100 text-amber-800 text-sm px-2 py-1 rounded">
+                              {item.city}
+                            </span>
+                            <span className="bg-gray-100 text-gray-600 text-sm px-2 py-1 rounded">
+                              {item.cuisineType || "Multi-cuisine"}
+                            </span>
+                          </div>
+                          <p className="text-gray-600 mb-2">
+                            <span className="font-medium">Address:</span>{" "}
+                            {item.address}
+                          </p>
+                          <div className="flex items-center gap-4 text-gray-600">
+                            <span className="flex items-center gap-1">
+                              📞 {item.contact}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              📧 {item.email}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                ))}
           </div>
         </div>
       </main>
