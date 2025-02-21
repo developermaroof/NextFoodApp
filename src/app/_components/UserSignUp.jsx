@@ -1,6 +1,7 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const UserSignUp = () => {
   const [name, setName] = useState("");
@@ -29,7 +30,7 @@ const UserSignUp = () => {
     });
     response = await response.json();
     if (response.success) {
-      alert("Successfully Signed Up");
+      toast.success("Successfully Signed Up");
       const { result } = response;
       delete result.password;
       localStorage.setItem("user", JSON.stringify(result));
@@ -39,7 +40,7 @@ const UserSignUp = () => {
         router.push("/");
       }
     } else {
-      alert("Failed to Sign Up");
+      toast.error("Failed to Sign Up");
     }
   };
 

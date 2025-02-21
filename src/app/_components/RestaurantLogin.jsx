@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const RestaurantLogin = () => {
   const [email, setEmail] = useState("");
@@ -30,9 +31,9 @@ const RestaurantLogin = () => {
       delete result.password;
       localStorage.setItem("restaurantUser", JSON.stringify(result));
       router.push("/restaurant/dashboard");
-      alert("Successfully Logged In");
+      toast.success("Successfully Logged In");
     } else {
-      alert("Invalid Email or Password");
+      toast.error("Invalid Email or Password");
     }
   };
 

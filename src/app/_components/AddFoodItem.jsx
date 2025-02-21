@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const AddFoodItem = (props) => {
   const [name, setName] = useState("");
@@ -23,10 +24,10 @@ const AddFoodItem = (props) => {
     });
     response = await response.json();
     if (response.success) {
-      alert("Food Item Added Successfully");
+      toast.success("Food Item Added Successfully");
       props.setAddItem(false);
     } else {
-      alert("Failed to Add Food Item");
+      toast.error("Failed to Add Food Item");
     }
   };
 

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const DeliveryPartnerLogin = () => {
   const [phone, setPhone] = useState("");
@@ -25,13 +26,13 @@ const DeliveryPartnerLogin = () => {
     response = await response.json();
 
     if (response.success) {
-      alert("Successfully Logged In");
+      toast.success("Successfully Logged In");
       const { result } = response;
       delete result.password;
       localStorage.setItem("deliverypartners", JSON.stringify(result));
       router.push("/deliverypartner/dashboard");
     } else {
-      alert("Login failed");
+      toast.error("Login failed");
     }
   };
 

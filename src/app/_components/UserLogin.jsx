@@ -1,5 +1,6 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const UserLogin = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +16,7 @@ const UserLogin = () => {
     });
     response = await response.json();
     if (response.success) {
-      alert("Successfully LoggedIn");
+      toast.success("Successfully LoggedIn");
       const { result } = response;
       delete result.password;
       localStorage.setItem("user", JSON.stringify(result));
@@ -25,7 +26,7 @@ const UserLogin = () => {
         router.push("/");
       }
     } else {
-      alert("Login failed");
+      toast.error("Login failed");
     }
   };
 

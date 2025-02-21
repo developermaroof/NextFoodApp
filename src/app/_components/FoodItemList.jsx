@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const FoodItemList = () => {
   const [foodItems, setFoodItems] = useState([]);
@@ -18,7 +19,7 @@ const FoodItemList = () => {
     if (response.success) {
       setFoodItems(response.result);
     } else {
-      alert("Couldn't find food items");
+      toast.error("Couldn't find food items");
     }
   };
 
@@ -28,10 +29,10 @@ const FoodItemList = () => {
     });
     response = await response.json();
     if (response.success) {
-      alert("Food Item deleted successfully");
+      toast.success("Food Item deleted successfully");
       loadFoodItems();
     } else {
-      alert("Failed to delete food item");
+      toast.error("Failed to delete food item");
     }
   };
 

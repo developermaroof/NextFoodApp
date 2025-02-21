@@ -1,6 +1,7 @@
 "use client";
 import { useRouter, useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const EditFoodItem = () => {
   const { id } = useParams();
@@ -46,10 +47,10 @@ const EditFoodItem = () => {
     });
     response = await response.json();
     if (response.success) {
-      alert("Food item has been updated successfully!");
+      toast.success("Food item has been updated successfully!");
       router.push("../dashboard");
     } else {
-      alert("Failed to update food item!");
+      toast.error("Failed to update food item!");
     }
   };
 

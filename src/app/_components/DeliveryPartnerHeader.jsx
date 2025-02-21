@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const DeliveryPartnerHeader = () => {
   const [deliveryPartnerDetails, setDeliveryPartnerDetails] = useState(null);
@@ -21,7 +22,7 @@ const DeliveryPartnerHeader = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("deliverypartners");
-    alert("Logged Out!");
+    toast.success("Logged Out!");
     router.push("/deliverypartner");
   };
 

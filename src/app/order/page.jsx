@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import CustomerHeader from "../_components/CustomerHeader";
 import Footer from "../_components/Footer";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const Order = () => {
   const [userStorage, setUserStorage] = useState(null);
@@ -57,7 +58,7 @@ const Order = () => {
     let deliveryBoy_id =
       deliveryBoyIds[Math.floor(Math.random() * deliveryBoyIds.length)];
     if (!deliveryBoy_id) {
-      alert("No delivery partners available in your city");
+      toast.error("No delivery partners available in your city");
       return false;
     }
 
@@ -75,11 +76,11 @@ const Order = () => {
     });
     response = await response.json();
     if (response.success) {
-      alert("Order Placed Successfully");
+      toast.success("Order Placed Successfully");
       setRemoveCartData(true);
       router.push("/myprofile");
     } else {
-      alert("Failed to Place Order");
+      toast.error("Failed to Place Order");
     }
   };
 

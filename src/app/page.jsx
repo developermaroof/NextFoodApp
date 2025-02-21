@@ -9,7 +9,6 @@ import "./globals.css";
 
 export default function Home() {
   const [locations, setLocations] = useState([]);
-  // Initialize restaurants as null to indicate "not fetched yet"
   const [restaurants, setRestaurants] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [showLocations, setShowLocations] = useState(false);

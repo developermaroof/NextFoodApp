@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const RestaurantSignup = () => {
   const [email, setEmail] = useState("");
@@ -48,13 +49,13 @@ const RestaurantSignup = () => {
     });
     response = await response.json();
     if (response.success) {
-      alert("Successfully Signed Up");
+      toast.success("Successfully Signed Up");
       const { result } = response;
       delete result.password;
       localStorage.setItem("restaurantUser", JSON.stringify(result));
       router.push("/restaurant/dashboard");
     } else {
-      alert("Failed to Sign Up");
+      toast.error("Failed to Sign Up");
     }
   };
 
