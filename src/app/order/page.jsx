@@ -4,22 +4,33 @@ import CustomerHeader from "../_components/CustomerHeader";
 import Footer from "../_components/Footer";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const Order = () => {
   const [userStorage, setUserStorage] = useState(null);
   const [cartStorage, setCartStorage] = useState([]);
   const [removeCartData, setRemoveCartData] = useState(false);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    // Client-side check
-    if (typeof window !== "undefined") {
-      const userData = localStorage.getItem("user");
-      setUserStorage(userData ? JSON.parse(userData) : null);
+    const loadData = () => {
+      try {
+        if (typeof window !== "undefined") {
+          const userData = localStorage.getItem("user");
+          setUserStorage(userData ? JSON.parse(userData) : null);
 
-      const cartData = localStorage.getItem("cartData");
-      setCartStorage(cartData ? JSON.parse(cartData) : []);
-    }
+          const cartData = localStorage.getItem("cartData");
+          setCartStorage(cartData ? JSON.parse(cartData) : []);
+        }
+      } catch (error) {
+        console.error("Error reading localStorage:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
   }, []);
 
   const total = cartStorage.reduce((sum, item) => {
@@ -41,56 +52,80 @@ const Order = () => {
     if (mounted && total === 0 && cartStorage.length === 0) {
       router.push("/");
     }
-  }, [mounted, total, cartStorage]);
+  }, [mounted, total, cartStorage, router]);
 
   const handleOrderNow = async () => {
-    const userData = JSON.parse(localStorage.getItem("user"));
-    let user_id = userData._id;
-    let user_city = userData.city;
+    try {
+      const userData = JSON.parse(localStorage.getItem("user"));
+      let user_id = userData._id;
+      let user_city = userData.city;
 
-    let cart = JSON.parse(localStorage.getItem("cartData"));
-    let foodItemIds = cart.map((item) => item._id).toString();
-    let resto_id = cart[0].food_id;
+      let cart = JSON.parse(localStorage.getItem("cartData"));
+      let foodItemIds = cart.map((item) => item._id).toString();
+      let resto_id = cart[0].food_id;
 
-    let deliveryBoyResponse = await fetch(`/api/deliverypartners/${user_city}`);
-    deliveryBoyResponse = await deliveryBoyResponse.json();
-    let deliveryBoyIds = deliveryBoyResponse.result.map((item) => item._id);
-    let deliveryBoy_id =
-      deliveryBoyIds[Math.floor(Math.random() * deliveryBoyIds.length)];
-    if (!deliveryBoy_id) {
-      toast.error("No delivery partners available in your city");
-      return false;
-    }
+      let deliveryBoyResponse = await fetch(
+        `/api/deliverypartners/${user_city}`
+      );
+      deliveryBoyResponse = await deliveryBoyResponse.json();
+      let deliveryBoyIds = deliveryBoyResponse.result.map((item) => item._id);
+      let deliveryBoy_id =
+        deliveryBoyIds[Math.floor(Math.random() * deliveryBoyIds.length)];
+      if (!deliveryBoy_id) {
+        toast.error("No delivery partners available in your city");
+        return;
+      }
 
-    let collection = {
-      user_id,
-      resto_id,
-      foodItemIds,
-      deliveryBoy_id,
-      status: "confirmed",
-      amount: totalAmount.toFixed(2),
-    };
-    let response = await fetch("/api/order", {
-      method: "POST",
-      body: JSON.stringify(collection),
-    });
-    response = await response.json();
-    if (response.success) {
-      toast.success("Order Placed Successfully");
-      setRemoveCartData(true);
-      router.push("/myprofile");
-    } else {
-      toast.error("Failed to Place Order");
+      let collection = {
+        user_id,
+        resto_id,
+        foodItemIds,
+        deliveryBoy_id,
+        status: "confirmed",
+        amount: totalAmount.toFixed(2),
+      };
+      let response = await fetch("/api/order", {
+        method: "POST",
+        body: JSON.stringify(collection),
+      });
+      response = await response.json();
+      if (response.success) {
+        toast.success("Order Placed Successfully");
+        setRemoveCartData(true);
+        router.push("/myprofile");
+      } else {
+        toast.error("Failed to Place Order");
+      }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      toast.error("An error occurred while placing the order.");
     }
   };
 
-  // Show loading state while data is being fetched
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <CustomerHeader />
+        <main className="container mx-auto px-4 py-8 flex-grow text-center">
+          <SkeletonTheme baseColor="#f5f5f5" highlightColor="#db9721">
+            <Skeleton height={40} width={300} className="mx-auto mb-8" />
+            <Skeleton count={5} />
+          </SkeletonTheme>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   if (!userStorage || cartStorage.length === 0) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
         <CustomerHeader />
         <main className="container mx-auto px-4 py-8 flex-grow text-center">
-          Loading...
+          <SkeletonTheme baseColor="#f5f5f5" highlightColor="#db9721">
+            <Skeleton height={40} width={300} className="mx-auto mb-8" />
+            <Skeleton count={5} />
+          </SkeletonTheme>
         </main>
         <Footer />
       </div>

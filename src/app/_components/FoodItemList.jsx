@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 
 const FoodItemList = () => {
   const [foodItems, setFoodItems] = useState([]);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -12,63 +13,97 @@ const FoodItemList = () => {
   }, []);
 
   const loadFoodItems = async () => {
-    const restaurantData = JSON.parse(localStorage.getItem("restaurantUser"));
-    const food_id = restaurantData._id;
-    let response = await fetch(`/api/restaurant/foods/${food_id}`);
-    response = await response.json();
-    if (response.success) {
-      setFoodItems(response.result);
-    } else {
-      toast.error("Couldn't find food items");
+    setLoading(true);
+    try {
+      let restaurantData = null;
+      try {
+        const storedData = localStorage.getItem("restaurantUser");
+        if (storedData) {
+          restaurantData = JSON.parse(storedData);
+        }
+      } catch (parseError) {
+        console.error(
+          "Error parsing restaurantUser from localStorage:",
+          parseError
+        );
+        toast.error("Invalid restaurant data stored");
+        return;
+      }
+      if (!restaurantData || !restaurantData._id) {
+        toast.error("Restaurant data not found");
+        return;
+      }
+      const food_id = restaurantData._id;
+      let response = await fetch(`/api/restaurant/foods/${food_id}`);
+      const data = await response.json();
+      if (data.success) {
+        setFoodItems(data.result);
+      } else {
+        toast.error("Couldn't find food items");
+      }
+    } catch (error) {
+      console.error("Error loading food items:", error);
+      toast.error("An error occurred while loading food items");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteFoodItem = async (id) => {
-    let response = await fetch(`/api/restaurant/foods/${id}`, {
-      method: "DELETE",
-    });
-    response = await response.json();
-    if (response.success) {
-      toast.success("Food Item deleted successfully");
-      loadFoodItems();
-    } else {
-      toast.error("Failed to delete food item");
+    try {
+      let response = await fetch(`/api/restaurant/foods/${id}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+      if (data.success) {
+        toast.success("Food Item deleted successfully");
+        loadFoodItems();
+      } else {
+        toast.error("Failed to delete food item");
+      }
+    } catch (error) {
+      console.error("Error deleting food item:", error);
+      toast.error("An error occurred while deleting the food item");
     }
   };
 
   return (
     <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-lg p-6">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Food Items List</h1>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-amber-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                S.No
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                Food Name
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                Price
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                Description
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                Image
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {foodItems &&
-              foodItems.map((item, key) => (
-                <tr key={key}>
+      {loading ? (
+        <p>Loading food items...</p>
+      ) : foodItems.length === 0 ? (
+        <p className="text-gray-600">No food items found.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-amber-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                  S.No
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                  Food Name
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                  Price
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                  Description
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                  Image
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {foodItems.map((item, index) => (
+                <tr key={item._id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {key + 1}
+                    {index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                     {item.name}
@@ -104,9 +139,10 @@ const FoodItemList = () => {
                   </td>
                 </tr>
               ))}
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

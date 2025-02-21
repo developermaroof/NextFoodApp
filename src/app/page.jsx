@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CustomerHeader from "./_components/CustomerHeader";
 import Footer from "./_components/Footer";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
+  const searchTimeoutRef = useRef(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -25,10 +26,16 @@ export default function Home() {
   }, []);
 
   const loadLocations = async () => {
-    let response = await fetch("/api/customer/locations");
-    response = await response.json();
-    if (response.success) {
-      setLocations(response.result);
+    try {
+      const response = await fetch("/api/customer/locations");
+      const data = await response.json();
+      if (data.success) {
+        setLocations(data.result);
+      } else {
+        console.error("Failed to fetch locations:", data);
+      }
+    } catch (error) {
+      console.error("Error fetching locations:", error);
     }
   };
 
@@ -44,7 +51,6 @@ export default function Home() {
       const res = await fetch(url);
       if (!res.ok) {
         console.error("API route not available, status:", res.status);
-        // Ensure restaurants is set to empty array if there's an error
         setRestaurants([]);
         return;
       }
@@ -112,9 +118,15 @@ export default function Home() {
                 <input
                   type="text"
                   placeholder="Search restaurants or cuisines"
-                  onChange={(e) =>
-                    loadRestaurants({ restaurant: e.target.value })
-                  }
+                  onChange={(e) => {
+                    // Debounce the search input to avoid excessive API calls
+                    if (searchTimeoutRef.current) {
+                      clearTimeout(searchTimeoutRef.current);
+                    }
+                    searchTimeoutRef.current = setTimeout(() => {
+                      loadRestaurants({ restaurant: e.target.value });
+                    }, 300);
+                  }}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-amber-500"
                 />
               </div>
@@ -180,7 +192,7 @@ export default function Home() {
                             </span>
                           </div>
                           <p className="text-gray-600 mb-2">
-                            <span className="font-medium">Address:</span>{" "}
+                            <span className="font-medium">Address:</span>
                             {item.address}
                           </p>
                           <div className="flex items-center gap-4 text-gray-600">

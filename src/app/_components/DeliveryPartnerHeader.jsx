@@ -10,13 +10,17 @@ const DeliveryPartnerHeader = () => {
   const pathName = usePathname();
 
   useEffect(() => {
-    const data = localStorage.getItem("deliverypartners");
-    if (!data && pathName === "/deliverypartner/dashboard") {
-      router.push("/deliverypartner");
-    } else if (data && pathName === "/deliverypartner") {
-      router.push("/deliverypartner/dashboard");
-    } else if (data) {
-      setDeliveryPartnerDetails(JSON.parse(data));
+    try {
+      const data = localStorage.getItem("deliverypartners");
+      if (!data && pathName === "/deliverypartner/dashboard") {
+        router.push("/deliverypartner");
+      } else if (data && pathName === "/deliverypartner") {
+        router.push("/deliverypartner/dashboard");
+      } else if (data) {
+        setDeliveryPartnerDetails(JSON.parse(data));
+      }
+    } catch (error) {
+      console.error("Error parsing delivery partner data:", error);
     }
   }, [pathName, router]);
 

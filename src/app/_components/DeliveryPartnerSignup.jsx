@@ -13,6 +13,7 @@ const DeliveryPartnerSignup = () => {
   const router = useRouter();
   const [error, setError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
     if (password !== confirmPassword) {
@@ -28,26 +29,35 @@ const DeliveryPartnerSignup = () => {
       setError(false);
     }
 
-    let response = await fetch("/api/deliverypartners/signup", {
-      method: "POST",
-      body: JSON.stringify({
-        name,
-        password,
-        city,
-        address,
-        phone,
-      }),
-    });
-    response = await response.json();
+    setLoading(true);
+    try {
+      let response = await fetch("/api/deliverypartners/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          password,
+          city,
+          address,
+          phone,
+        }),
+      });
+      const data = await response.json();
 
-    if (response.success) {
-      toast.success("Successfully Signed Up");
-      const { result } = response;
-      delete result.password;
-      localStorage.setItem("deliverypartners", JSON.stringify(result));
-      router.push("/deliverypartner/dashboard");
-    } else {
-      toast.error("Failed to Sign Up");
+      if (data.success) {
+        toast.success("Successfully Signed Up");
+        const { result } = data;
+        delete result.password;
+        localStorage.setItem("deliverypartners", JSON.stringify(result));
+        router.push("/deliverypartner/dashboard");
+      } else {
+        toast.error("Failed to Sign Up");
+      }
+    } catch (error) {
+      console.error("Error during signup:", error);
+      toast.error("An error occurred during signup");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,7 +136,7 @@ const DeliveryPartnerSignup = () => {
         </div>
         <div>
           <input
-            type="tel"
+            type="number"
             placeholder="Enter Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -141,9 +151,12 @@ const DeliveryPartnerSignup = () => {
       </div>
       <button
         onClick={handleSignUp}
-        className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-lg transition-colors"
+        disabled={loading}
+        className={`w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-lg transition-colors ${
+          loading ? "opacity-50 cursor-not-allowed" : ""
+        }`}
       >
-        Create Account
+        {loading ? "Creating Account..." : "Create Account"}
       </button>
     </div>
   );

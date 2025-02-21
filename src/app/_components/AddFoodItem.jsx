@@ -8,6 +8,7 @@ const AddFoodItem = (props) => {
   const [path, setPath] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleAddFood = async () => {
     if (!name || !price || !path || !description) {
@@ -16,18 +17,26 @@ const AddFoodItem = (props) => {
     } else {
       setError(false);
     }
-    const restaurantData = JSON.parse(localStorage.getItem("restaurantUser"));
-    const food_id = restaurantData?._id;
-    let response = await fetch("/api/restaurant/foods", {
-      method: "POST",
-      body: JSON.stringify({ name, price, path, description, food_id }),
-    });
-    response = await response.json();
-    if (response.success) {
-      toast.success("Food Item Added Successfully");
-      props.setAddItem(false);
-    } else {
-      toast.error("Failed to Add Food Item");
+    try {
+      setLoading(true);
+      const restaurantData = JSON.parse(localStorage.getItem("restaurantUser"));
+      const food_id = restaurantData?._id;
+      let response = await fetch("/api/restaurant/foods", {
+        method: "POST",
+        body: JSON.stringify({ name, price, path, description, food_id }),
+      });
+      let data = await response.json();
+      if (data.success) {
+        toast.success("Food Item Added Successfully");
+        props.setAddItem(false);
+      } else {
+        toast.error("Failed to Add Food Item");
+      }
+    } catch (error) {
+      console.error("Error adding food item:", error);
+      toast.error("An error occurred while adding the food item.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -92,9 +101,12 @@ const AddFoodItem = (props) => {
       </div>
       <button
         onClick={handleAddFood}
-        className="mt-6 w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-lg transition-colors"
+        disabled={loading}
+        className={`mt-6 w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-lg transition-colors ${
+          loading ? "opacity-50 cursor-not-allowed" : ""
+        }`}
       >
-        Add
+        {loading ? "Adding..." : "Add"}
       </button>
     </div>
   );

@@ -10,13 +10,19 @@ const RestaurantHeader = () => {
   const pathName = usePathname();
 
   useEffect(() => {
-    const data = localStorage.getItem("restaurantUser");
-    if (!data && pathName === "/restaurant/dashboard") {
-      router.push("/restaurant");
-    } else if (data && pathName === "/restaurant") {
-      router.push("/restaurant/dashboard");
-    } else if (data) {
-      setUserDetails(JSON.parse(data));
+    try {
+      const data = localStorage.getItem("restaurantUser");
+      if (!data && pathName === "/restaurant/dashboard") {
+        router.push("/restaurant");
+      } else if (data && pathName === "/restaurant") {
+        router.push("/restaurant/dashboard");
+      } else if (data) {
+        setUserDetails(JSON.parse(data));
+      }
+    } catch (error) {
+      console.error("Error parsing restaurant user data:", error);
+      // Optionally clear the invalid data:
+      localStorage.removeItem("restaurantUser");
     }
   }, [pathName, router]);
 
@@ -40,7 +46,11 @@ const RestaurantHeader = () => {
               FoodApp
             </span>
           </Link>
-          <nav className="hidden md:flex">
+          <nav
+            className="hidden md:flex"
+            role="navigation"
+            aria-label="Main Navigation"
+          >
             <ul className="flex items-center space-x-6">
               <li>
                 <Link

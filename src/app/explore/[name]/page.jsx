@@ -3,16 +3,19 @@ import CustomerHeader from "@/app/_components/CustomerHeader";
 import Footer from "@/app/_components/Footer";
 import React, { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
+import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const Details = () => {
   // Unwrap dynamic route params and search params
   const params = useParams();
   const searchParams = useSearchParams();
 
-  const restaurantName = params.name; // useParams() returns the resolved params
-  const [restaurantDetails, setRestaurantDetails] = useState();
+  const restaurantName = params.name; // Resolved dynamic route param
+  const [restaurantDetails, setRestaurantDetails] = useState(null);
   const [foodItems, setFoodItems] = useState([]);
-  const [cartData, setCartData] = useState();
+  const [loading, setLoading] = useState(true);
+  const [detailsError, setDetailsError] = useState(null);
 
   // Lazy initialize cartStorage only on client
   const [cartStorage, setCartStorage] = useState(() => {
@@ -23,37 +26,59 @@ const Details = () => {
     return [];
   });
 
-  const [cartId, setCartId] = useState(
-    () => cartStorage.map((item) => item._id) || []
+  // Derive cartId from cartStorage
+  const [cartId, setCartId] = useState(() =>
+    cartStorage.map((item) => item._id)
   );
-  const [removeCartData, setRemoveCartData] = useState();
+  const [cartData, setCartData] = useState(null);
+  const [removeCartData, setRemoveCartData] = useState(null);
 
   useEffect(() => {
     loadRestaurantDetails();
   }, []);
 
   const loadRestaurantDetails = async () => {
-    const id = searchParams.get("id");
-    let response = await fetch(`/api/customer/${id}`);
-    response = await response.json();
-    if (response.success) {
-      setRestaurantDetails(response.restaurantDetails);
-      setFoodItems(response.foodItems);
+    setLoading(true);
+    setDetailsError(null);
+    try {
+      const id = searchParams.get("id");
+      let response = await fetch(`/api/customer/${id}`);
+      const data = await response.json();
+      if (data.success) {
+        setRestaurantDetails(data.restaurantDetails);
+        setFoodItems(data.foodItems);
+      } else {
+        setDetailsError(data.message || "Failed to load restaurant details.");
+      }
+    } catch (error) {
+      console.error("Error fetching restaurant details:", error);
+      setDetailsError("Error fetching restaurant details.");
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Persist cartStorage changes to localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("cartData", JSON.stringify(cartStorage));
+    }
+  }, [cartStorage]);
 
   const handleAddToCart = (item) => {
     setCartData(item);
     const newCartIds = [...cartId, item._id];
     setCartId(newCartIds);
-    setRemoveCartData(undefined);
+    setCartStorage((prev) => [...prev, item]);
+    setRemoveCartData(null);
   };
 
   const handleRemoveFromCart = (id) => {
     setRemoveCartData(id);
-    const updatedCartIds = cartId.filter((item) => item !== id);
-    setCartData(undefined);
+    const updatedCartIds = cartId.filter((itemId) => itemId !== id);
     setCartId(updatedCartIds);
+    setCartStorage((prev) => prev.filter((item) => item._id !== id));
+    setCartData(null);
   };
 
   return (
@@ -70,22 +95,79 @@ const Details = () => {
       </div>
 
       {/* Restaurant Details Card */}
-      <div className="max-w-4xl mx-auto my-8 p-6 bg-white rounded-xl shadow-md">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
-          <h4 className="font-semibold">Contact:</h4>
-          <p>{restaurantDetails?.contact}</p>
-          <h4 className="font-semibold">City:</h4>
-          <p>{restaurantDetails?.city}</p>
-          <h4 className="font-semibold">Address:</h4>
-          <p>{restaurantDetails?.address}</p>
-          <h4 className="font-semibold">Email:</h4>
-          <p>{restaurantDetails?.email}</p>
+      {loading ? (
+        <SkeletonTheme baseColor="#f5f5f5" highlightColor="#db9721">
+          <div className="max-w-4xl mx-auto my-8 p-6 bg-white rounded-xl shadow-md">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+              <h4 className="font-semibold">Contact:</h4>
+              <p>
+                <Skeleton width={200} height={20} />
+              </p>
+              <h4 className="font-semibold">City:</h4>
+              <p>
+                <Skeleton width={200} height={20} />
+              </p>
+              <h4 className="font-semibold">Address:</h4>
+              <p>
+                <Skeleton width={200} height={20} />
+              </p>
+              <h4 className="font-semibold">Email:</h4>
+              <p>
+                <Skeleton width={200} height={20} />
+              </p>
+            </div>
+          </div>
+        </SkeletonTheme>
+      ) : detailsError ? (
+        <div className="max-w-4xl mx-auto my-8 p-6 bg-white rounded-xl shadow-md text-center text-red-500">
+          <p>{detailsError}</p>
+          <button
+            onClick={loadRestaurantDetails}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Retry
+          </button>
         </div>
-      </div>
+      ) : (
+        <div className="max-w-4xl mx-auto my-8 p-6 bg-white rounded-xl shadow-md">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+            <h4 className="font-semibold">Contact:</h4>
+            <p>{restaurantDetails?.contact}</p>
+            <h4 className="font-semibold">City:</h4>
+            <p>{restaurantDetails?.city}</p>
+            <h4 className="font-semibold">Address:</h4>
+            <p>{restaurantDetails?.address}</p>
+            <h4 className="font-semibold">Email:</h4>
+            <p>{restaurantDetails?.email}</p>
+          </div>
+        </div>
+      )}
 
       {/* Food Items List */}
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {foodItems.length > 0 ? (
+        {loading ? (
+          <SkeletonTheme baseColor="#f5f5f5" highlightColor="#db9721">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-lg shadow-lg overflow-hidden p-4"
+                >
+                  <div className="flex gap-4">
+                    <div className="w-24 h-24 md:w-32 md:h-32">
+                      <Skeleton width="100%" height="100%" />
+                    </div>
+                    <div className="flex flex-col flex-grow">
+                      <Skeleton height={24} width="60%" className="mb-2" />
+                      <Skeleton count={2} />
+                      <Skeleton height={20} width="40%" className="mt-4" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SkeletonTheme>
+        ) : foodItems.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {foodItems.map((item) => (
               <div

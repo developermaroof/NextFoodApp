@@ -2,6 +2,8 @@
 import { useRouter, useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const EditFoodItem = () => {
   const { id } = useParams();
@@ -10,6 +12,7 @@ const EditFoodItem = () => {
   const [path, setPath] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -19,13 +22,22 @@ const EditFoodItem = () => {
   }, [id]);
 
   const handleLoadFoodItem = async () => {
-    let response = await fetch(`/api/restaurant/foods/edit/${id}`);
-    response = await response.json();
-    if (response.success) {
-      setName(response.result.name);
-      setPrice(response.result.price);
-      setPath(response.result.path);
-      setDescription(response.result.description);
+    try {
+      const response = await fetch(`/api/restaurant/foods/edit/${id}`);
+      const data = await response.json();
+      if (data.success) {
+        setName(data.result.name);
+        setPrice(data.result.price);
+        setPath(data.result.path);
+        setDescription(data.result.description);
+      } else {
+        toast.error("Failed to load food item details.");
+      }
+    } catch (err) {
+      console.error("Error loading food item:", err);
+      toast.error("An error occurred while loading food item details.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -36,23 +48,42 @@ const EditFoodItem = () => {
     } else {
       setError(false);
     }
-    let response = await fetch(`/api/restaurant/foods/edit/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        name,
-        price,
-        path,
-        description,
-      }),
-    });
-    response = await response.json();
-    if (response.success) {
-      toast.success("Food item has been updated successfully!");
-      router.push("../dashboard");
-    } else {
-      toast.error("Failed to update food item!");
+    try {
+      const response = await fetch(`/api/restaurant/foods/edit/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          name,
+          price,
+          path,
+          description,
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        toast.success("Food item has been updated successfully!");
+        router.push("../dashboard");
+      } else {
+        toast.error("Failed to update food item!");
+      }
+    } catch (err) {
+      console.error("Error updating food item:", err);
+      toast.error("An error occurred while updating the food item.");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-md mx-auto bg-white rounded-xl shadow-md p-8 text-center">
+        <SkeletonTheme baseColor="#f5f5f5" highlightColor="#db9721">
+          <Skeleton height={30} width="80%" className="mb-4 mx-auto" />
+          <Skeleton height={40} width="100%" className="mb-4" />
+          <Skeleton height={40} width="100%" className="mb-4" />
+          <Skeleton height={40} width="100%" className="mb-4" />
+          <Skeleton height={40} width="100%" className="mb-4" />
+        </SkeletonTheme>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto bg-white rounded-xl shadow-md p-8">

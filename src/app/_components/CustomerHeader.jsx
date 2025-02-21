@@ -14,15 +14,23 @@ const CustomerHeader = (props) => {
   // Load initial values from localStorage (client-side only)
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedCart = localStorage.getItem("cartData");
-      if (storedCart) {
-        const parsedCart = JSON.parse(storedCart);
-        setCartNumber(parsedCart.length);
-        setCartItems(parsedCart);
+      try {
+        const storedCart = localStorage.getItem("cartData");
+        if (storedCart) {
+          const parsedCart = JSON.parse(storedCart);
+          setCartNumber(parsedCart.length);
+          setCartItems(parsedCart);
+        }
+      } catch (error) {
+        console.error("Error parsing cart data:", error);
       }
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.error("Error parsing user data:", error);
       }
     }
   }, []);
@@ -91,7 +99,6 @@ const CustomerHeader = (props) => {
 
           <nav className="hidden md:flex space-x-8">
             <ul className="flex items-center space-x-6">
-              {/* ... rest of list items */}
               <li>
                 <Link
                   href="/"
