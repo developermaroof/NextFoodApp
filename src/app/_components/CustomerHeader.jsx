@@ -1,15 +1,17 @@
 "use client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const CustomerHeader = (props) => {
   const router = useRouter();
+  const pathname = usePathname();
 
   // Initialize state with safe defaults
   const [cartNumber, setCartNumber] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [user, setUser] = useState(undefined);
+  const [isCartLoading, setIsCartLoading] = useState(false);
 
   // Load initial values from localStorage (client-side only)
   useEffect(() => {
@@ -82,6 +84,24 @@ const CustomerHeader = (props) => {
     router.push("/user-auth");
   };
 
+  const handleCartClick = () => {
+    if (cartNumber) {
+      // If already on the cart page, do nothing.
+      if (pathname === "/cart") {
+        return;
+      }
+      setIsCartLoading(true);
+      router.push("/cart");
+    }
+  };
+
+  // Reset the loading spinner when the pathname changes to "/cart"
+  useEffect(() => {
+    if (pathname === "/cart") {
+      setIsCartLoading(false);
+    }
+  }, [pathname]);
+
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -147,12 +167,22 @@ const CustomerHeader = (props) => {
                 </>
               )}
               <li>
-                <Link
-                  href={cartNumber ? "/cart" : "#"}
-                  className="flex items-center bg-amber-100 px-4 py-2 rounded-full hover:bg-amber-200 transition-colors"
-                >
-                  🛒 Cart ({cartNumber})
-                </Link>
+                {cartNumber ? (
+                  <button
+                    onClick={handleCartClick}
+                    className="flex items-center bg-amber-100 px-4 py-2 rounded-full hover:bg-amber-200 transition-colors"
+                  >
+                    {isCartLoading ? (
+                      <div className="w-5 h-5 border-2 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <>🛒 Cart ({cartNumber})</>
+                    )}
+                  </button>
+                ) : (
+                  <span className="flex items-center bg-amber-100 px-4 py-2 rounded-full transition-colors">
+                    🛒 Cart ({cartNumber})
+                  </span>
+                )}
               </li>
               <li>
                 <Link

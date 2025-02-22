@@ -6,6 +6,8 @@ import { toast } from "react-toastify";
 const FoodItemList = () => {
   const [foodItems, setFoodItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [editingItemId, setEditingItemId] = useState(null);
+  const [deletingItemId, setDeletingItemId] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -67,6 +69,17 @@ const FoodItemList = () => {
     }
   };
 
+  const handleEditFoodItem = (id) => {
+    setEditingItemId(id);
+    router.push(`/restaurant/dashboard/${id}`);
+  };
+
+  const handleDeleteWrapper = async (id) => {
+    setDeletingItemId(id);
+    await handleDeleteFoodItem(id);
+    setDeletingItemId(null);
+  };
+
   return (
     <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-lg p-6">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Food Items List</h1>
@@ -123,18 +136,24 @@ const FoodItemList = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 space-x-2">
                     <button
-                      onClick={() =>
-                        router.push(`/restaurant/dashboard/${item._id}`)
-                      }
+                      onClick={() => handleEditFoodItem(item._id)}
                       className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-3 py-1 rounded transition-colors"
+                      disabled={
+                        editingItemId === item._id ||
+                        deletingItemId === item._id
+                      }
                     >
-                      Edit
+                      {editingItemId === item._id ? "Editing..." : "Edit"}
                     </button>
                     <button
-                      onClick={() => handleDeleteFoodItem(item._id)}
+                      onClick={() => handleDeleteWrapper(item._id)}
                       className="bg-red-500 hover:bg-red-600 text-white font-semibold px-3 py-1 rounded transition-colors"
+                      disabled={
+                        deletingItemId === item._id ||
+                        editingItemId === item._id
+                      }
                     >
-                      Delete
+                      {deletingItemId === item._id ? "Deleting..." : "Delete"}
                     </button>
                   </td>
                 </tr>

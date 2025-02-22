@@ -12,6 +12,7 @@ const Order = () => {
   const [cartStorage, setCartStorage] = useState([]);
   const [removeCartData, setRemoveCartData] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [orderLoading, setOrderLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -26,6 +27,7 @@ const Order = () => {
         }
       } catch (error) {
         console.error("Error reading localStorage:", error);
+        toast.error("Error loading user data.");
       } finally {
         setLoading(false);
       }
@@ -43,36 +45,35 @@ const Order = () => {
   const tax = (total * taxRate) / 100;
   const delivery = 200;
   const totalAmount = total + tax + delivery;
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (mounted && total === 0 && cartStorage.length === 0) {
-      router.push("/");
-    }
-  }, [mounted, total, cartStorage, router]);
 
   const handleOrderNow = async () => {
+    if (!userStorage || cartStorage.length === 0) {
+      toast.error("User information or cart data is missing.");
+      return;
+    }
+    setOrderLoading(true);
     try {
-      const userData = JSON.parse(localStorage.getItem("user"));
-      let user_id = userData._id;
-      let user_city = userData.city;
-
-      let cart = JSON.parse(localStorage.getItem("cartData"));
+      const { _id: user_id, city: user_city } = userStorage;
+      const cart = cartStorage;
       let foodItemIds = cart.map((item) => item._id).toString();
       let resto_id = cart[0].food_id;
 
-      let deliveryBoyResponse = await fetch(
+      // Fetch delivery partners based on user city
+      let deliveryPartnerResponse = await fetch(
         `/api/deliverypartners/${user_city}`
       );
-      deliveryBoyResponse = await deliveryBoyResponse.json();
-      let deliveryBoyIds = deliveryBoyResponse.result.map((item) => item._id);
+      if (!deliveryPartnerResponse.ok) {
+        toast.error("Failed to fetch delivery partners.");
+        setOrderLoading(false);
+        return;
+      }
+      const deliveryPartnerData = await deliveryPartnerResponse.json();
+      let deliveryBoyIds = deliveryPartnerData.result.map((item) => item._id);
       let deliveryBoy_id =
         deliveryBoyIds[Math.floor(Math.random() * deliveryBoyIds.length)];
       if (!deliveryBoy_id) {
-        toast.error("No delivery partners available in your city");
+        toast.error("No delivery partners available in your city.");
+        setOrderLoading(false);
         return;
       }
 
@@ -84,21 +85,33 @@ const Order = () => {
         status: "confirmed",
         amount: totalAmount.toFixed(2),
       };
+
+      // Place the order
       let response = await fetch("/api/order", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(collection),
       });
-      response = await response.json();
-      if (response.success) {
+      if (!response.ok) {
+        toast.error("Failed to place order. Please try again later.");
+        setOrderLoading(false);
+        return;
+      }
+      let responseData = await response.json();
+      if (responseData.success) {
         toast.success("Order Placed Successfully");
         setRemoveCartData(true);
         router.push("/myprofile");
       } else {
-        toast.error("Failed to Place Order");
+        toast.error("Failed to place order.");
       }
     } catch (error) {
       console.error("Error placing order:", error);
       toast.error("An error occurred while placing the order.");
+    } finally {
+      setOrderLoading(false);
     }
   };
 
@@ -122,10 +135,18 @@ const Order = () => {
       <div className="min-h-screen flex flex-col bg-gray-50">
         <CustomerHeader />
         <main className="container mx-auto px-4 py-8 flex-grow text-center">
-          <SkeletonTheme baseColor="#f5f5f5" highlightColor="#db9721">
-            <Skeleton height={40} width={300} className="mx-auto mb-8" />
-            <Skeleton count={5} />
-          </SkeletonTheme>
+          <h2 className="text-2xl font-bold text-gray-800">
+            No order information available.
+          </h2>
+          <p className="mt-4 text-gray-600">
+            Please ensure you are logged in and have items in your cart.
+          </p>
+          <button
+            onClick={() => router.push("/")}
+            className="mt-6 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Go to Home
+          </button>
         </main>
         <Footer />
       </div>
@@ -135,7 +156,6 @@ const Order = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <CustomerHeader removeCartData={removeCartData} />
-
       <main className="container mx-auto px-4 py-8 flex-grow">
         <h1 className="text-4xl font-bold text-center text-amber-700 mb-10">
           Confirm Your Order
@@ -169,7 +189,6 @@ const Order = () => {
               </div>
             </div>
           </div>
-
           {/* Amount Details & Payment Card */}
           <div className="bg-white shadow-xl rounded-lg p-6 flex flex-col justify-between">
             <div>
@@ -206,9 +225,14 @@ const Order = () => {
               </div>
               <button
                 onClick={handleOrderNow}
-                className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg transition-colors text-xl"
+                disabled={orderLoading}
+                className={`w-full ${
+                  orderLoading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-amber-600 hover:bg-amber-700"
+                } text-white font-bold py-3 rounded-lg transition-colors text-xl`}
               >
-                Place Your Order Now
+                {orderLoading ? "Processing..." : "Place Your Order Now"}
               </button>
             </div>
           </div>

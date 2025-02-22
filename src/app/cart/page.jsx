@@ -61,11 +61,11 @@ const Cart = () => {
       console.error("Error parsing user data from localStorage:", error);
     }
     if (user) {
-      router.push("/order");
+      await router.push("/order");
     } else {
-      router.push("/user-auth?order=true");
+      await router.push("/user-auth?order=true");
     }
-    setOrderLoading(false);
+    // No need to call setOrderLoading(false) because navigation will unmount the component.
   };
 
   return (

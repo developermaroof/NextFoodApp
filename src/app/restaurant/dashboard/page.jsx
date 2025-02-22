@@ -1,5 +1,6 @@
 "use client";
 import RestaurantHeader from "@/app/_components/RestaurantHeader";
+import Footer from "@/app/_components/Footer";
 import React, { useState, useEffect } from "react";
 import AddFoodItem from "@/app/_components/AddFoodItem";
 import FoodItemList from "@/app/_components/FoodItemList";
@@ -7,20 +8,14 @@ import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 const Dashboard = () => {
-  const [addItem, setAddItem] = useState(false);
+  const [activeTab, setActiveTab] = useState("dashboard"); // "dashboard" or "addFood"
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      // Simulate a delay for loading state
-      const timer = setTimeout(() => {
-        setLoading(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    } catch (error) {
-      console.error("Error during loading:", error);
+    const timer = setTimeout(() => {
       setLoading(false);
-    }
+    }, 300);
+    return () => clearTimeout(timer);
   }, []);
 
   if (loading) {
@@ -33,6 +28,7 @@ const Dashboard = () => {
             <Skeleton count={5} />
           </SkeletonTheme>
         </main>
+        <Footer />
       </div>
     );
   }
@@ -44,9 +40,10 @@ const Dashboard = () => {
         {/* Tabs */}
         <div className="max-w-md mx-auto mb-8 flex justify-center space-x-4">
           <button
-            onClick={() => setAddItem(true)}
+            onClick={() => setActiveTab("addFood")}
+            aria-selected={activeTab === "addFood"}
             className={`px-4 py-2 rounded-full font-semibold transition-colors ${
-              addItem
+              activeTab === "addFood"
                 ? "bg-amber-600 text-white"
                 : "bg-white text-gray-600 hover:bg-amber-50"
             }`}
@@ -54,9 +51,10 @@ const Dashboard = () => {
             Add Food
           </button>
           <button
-            onClick={() => setAddItem(false)}
+            onClick={() => setActiveTab("dashboard")}
+            aria-selected={activeTab === "dashboard"}
             className={`px-4 py-2 rounded-full font-semibold transition-colors ${
-              !addItem
+              activeTab === "dashboard"
                 ? "bg-amber-600 text-white"
                 : "bg-white text-gray-600 hover:bg-amber-50"
             }`}
@@ -64,8 +62,13 @@ const Dashboard = () => {
             Dashboard
           </button>
         </div>
-        {addItem ? <AddFoodItem setAddItem={setAddItem} /> : <FoodItemList />}
+        {activeTab === "addFood" ? (
+          <AddFoodItem setAddItem={setActiveTab} />
+        ) : (
+          <FoodItemList />
+        )}
       </main>
+      <Footer />
     </div>
   );
 };

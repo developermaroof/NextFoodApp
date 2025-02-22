@@ -13,6 +13,7 @@ const EditFoodItem = () => {
   const [description, setDescription] = useState("");
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [submitLoading, setSubmitLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -24,6 +25,11 @@ const EditFoodItem = () => {
   const handleLoadFoodItem = async () => {
     try {
       const response = await fetch(`/api/restaurant/foods/edit/${id}`);
+      if (!response.ok) {
+        toast.error("Failed to load food item details.");
+        setLoading(false);
+        return;
+      }
       const data = await response.json();
       if (data.success) {
         setName(data.result.name);
@@ -42,22 +48,25 @@ const EditFoodItem = () => {
   };
 
   const handleEditFood = async () => {
+    // Basic validation
     if (!name || !price || !path || !description) {
       setError(true);
-      return false;
+      return;
     } else {
       setError(false);
     }
+    setSubmitLoading(true);
     try {
       const response = await fetch(`/api/restaurant/foods/edit/${id}`, {
         method: "PUT",
-        body: JSON.stringify({
-          name,
-          price,
-          path,
-          description,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, price, path, description }),
       });
+      if (!response.ok) {
+        toast.error("Failed to update food item!");
+        setSubmitLoading(false);
+        return;
+      }
       const data = await response.json();
       if (data.success) {
         toast.success("Food item has been updated successfully!");
@@ -68,6 +77,8 @@ const EditFoodItem = () => {
     } catch (err) {
       console.error("Error updating food item:", err);
       toast.error("An error occurred while updating the food item.");
+    } finally {
+      setSubmitLoading(false);
     }
   };
 
@@ -146,9 +157,10 @@ const EditFoodItem = () => {
       </div>
       <button
         onClick={handleEditFood}
-        className="mt-6 w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-lg transition-colors"
+        disabled={submitLoading}
+        className="mt-6 w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50"
       >
-        Update
+        {submitLoading ? "Updating..." : "Update"}
       </button>
       <button
         onClick={() => router.push("../dashboard")}

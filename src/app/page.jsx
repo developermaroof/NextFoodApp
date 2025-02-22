@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import CustomerHeader from "./_components/CustomerHeader";
 import Footer from "./_components/Footer";
 import { useRouter } from "next/navigation";
@@ -13,19 +13,21 @@ export default function Home() {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [showLocations, setShowLocations] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [restaurantSearch, setRestaurantSearch] = useState("");
+  const [clickedRestaurantId, setClickedRestaurantId] = useState(null);
   const router = useRouter();
   const searchTimeoutRef = useRef(null);
 
+  // Cleanup search timeout on unmount
   useEffect(() => {
-    const timer = setTimeout(() => {
-      loadLocations();
-      loadRestaurants();
-    }, 300); // 300ms delay
-    return () => clearTimeout(timer);
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
   }, []);
 
-  const loadLocations = async () => {
+  const loadLocations = useCallback(async () => {
     try {
       const response = await fetch("/api/customer/locations");
       const data = await response.json();
@@ -37,9 +39,9 @@ export default function Home() {
     } catch (error) {
       console.error("Error fetching locations:", error);
     }
-  };
+  }, []);
 
-  const loadRestaurants = async (params) => {
+  const loadRestaurants = useCallback(async (params) => {
     setLoading(true);
     try {
       let url = "/api/customer";
@@ -67,12 +69,32 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadLocations();
+      loadRestaurants({ restaurant: restaurantSearch });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [loadLocations, loadRestaurants, restaurantSearch]);
 
   const handleListItem = (item) => {
     setSelectedLocation(item);
     setShowLocations(false);
     loadRestaurants({ location: item });
+  };
+
+  const handleRestaurantSearchChange = (e) => {
+    const value = e.target.value;
+    setRestaurantSearch(value);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      loadRestaurants({ restaurant: value });
+    }, 300);
   };
 
   return (
@@ -96,15 +118,21 @@ export default function Home() {
                   value={selectedLocation}
                   onClick={() => setShowLocations(true)}
                   readOnly
+                  aria-haspopup="listbox"
+                  aria-expanded={showLocations}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-amber-500 cursor-pointer"
                 />
                 {showLocations && (
-                  <ul className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <ul
+                    className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                    role="listbox"
+                  >
                     {locations.map((item) => (
                       <li
                         key={item}
                         onClick={() => handleListItem(item)}
                         className="px-4 py-3 hover:bg-amber-50 cursor-pointer transition-colors"
+                        role="option"
                       >
                         {item}
                       </li>
@@ -118,15 +146,8 @@ export default function Home() {
                 <input
                   type="text"
                   placeholder="Search restaurants or cuisines"
-                  onChange={(e) => {
-                    // Debounce the search input to avoid excessive API calls
-                    if (searchTimeoutRef.current) {
-                      clearTimeout(searchTimeoutRef.current);
-                    }
-                    searchTimeoutRef.current = setTimeout(() => {
-                      loadRestaurants({ restaurant: e.target.value });
-                    }, 300);
-                  }}
+                  value={restaurantSearch}
+                  onChange={handleRestaurantSearchChange}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-amber-500"
                 />
               </div>
@@ -169,14 +190,22 @@ export default function Home() {
                 ))
               : restaurants.map((item) => (
                   <div
-                    onClick={() =>
+                    onClick={() => {
+                      setClickedRestaurantId(item._id);
                       router.push(
-                        `explore/${item.restaurantName}?id=${item._id}`
-                      )
-                    }
+                        `explore/${encodeURIComponent(
+                          item.restaurantName
+                        )}?id=${item._id}`
+                      );
+                    }}
                     key={item._id}
-                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer relative"
                   >
+                    {clickedRestaurantId === item._id && (
+                      <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-75 z-10">
+                        <div className="w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    )}
                     <div className="p-6">
                       <div className="flex flex-col gap-4">
                         <div className="flex-grow">
@@ -192,7 +221,7 @@ export default function Home() {
                             </span>
                           </div>
                           <p className="text-gray-600 mb-2">
-                            <span className="font-medium">Address:</span>
+                            <span className="font-medium">Address:</span>{" "}
                             {item.address}
                           </p>
                           <div className="flex items-center gap-4 text-gray-600">
